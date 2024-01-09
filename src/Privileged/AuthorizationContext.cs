@@ -1,12 +1,26 @@
 namespace Privileged;
 
-public class AuthorizationContext(IReadOnlyCollection<AuthorizationRule> rules, StringComparer? stringComparer = null)
+/// <summary>
+/// The authorization context used to check privileges
+/// </summary>
+/// <param name="rules">The authorization rules for this context</param>
+/// <param name="stringComparer">The <see cref="StringComparer"/> used for matching names</param>
+/// <seealso cref="Privileged.IAuthorizationContext" />
+public class AuthorizationContext(IReadOnlyCollection<AuthorizationRule> rules, StringComparer? stringComparer = null) : IAuthorizationContext
 {
+    /// <inheritdoc />
     public IReadOnlyCollection<AuthorizationRule> Rules { get; } = rules ?? throw new ArgumentNullException(nameof(rules));
 
+    /// <summary>
+    /// Gets the <see cref="StringComparer"/> used for matching names.
+    /// </summary>
+    /// <value>
+    /// The <see cref="StringComparer"/> used for matching names.
+    /// </value>
     public StringComparer StringComparer { get; } = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
 
 
+    /// <inheritdoc />
     public bool Authorized(string? action, string? subject, string? field = null)
     {
         if (action is null || subject is null)
@@ -26,8 +40,10 @@ public class AuthorizationContext(IReadOnlyCollection<AuthorizationRule> rules, 
         return state ?? false;
     }
 
+    /// <inheritdoc />
     public bool Unauthorized(string? action, string? subject, string? field = null) => !Authorized(action, subject, field);
 
+    /// <inheritdoc />
     public IEnumerable<AuthorizationRule> MatchRules(string? action, string? subject, string? field = null)
     {
         if (action is null || subject is null)
