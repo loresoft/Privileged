@@ -1,4 +1,4 @@
-namespace Authorizone;
+namespace Privileged;
 
 public record AuthorizationRule(
     string Action,

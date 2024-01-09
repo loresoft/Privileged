@@ -28,7 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Authorizone\Authorizone.csproj" />
+    <ProjectReference Include="..\..\src\Privileged\Privileged.csproj" />
   </ItemGroup>
 
 </Project>

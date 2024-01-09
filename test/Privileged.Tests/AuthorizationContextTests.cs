@@ -1,4 +1,4 @@
-namespace Authorizone.Tests;
+namespace Privileged.Tests;
 
 public class AuthorizationContextTests
 {

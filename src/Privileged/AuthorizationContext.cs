@@ -1,4 +1,4 @@
-namespace Authorizone;
+namespace Privileged;
 
 public class AuthorizationContext(IReadOnlyCollection<AuthorizationRule> rules, StringComparer? stringComparer = null)
 {

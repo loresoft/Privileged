@@ -1,4 +1,4 @@
-namespace Authorizone;
+namespace Privileged;
 
 public static class AuthorizationBuilderExtensions
 {
