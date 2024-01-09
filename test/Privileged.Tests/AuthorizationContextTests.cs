@@ -76,6 +76,4 @@ public class AuthorizationContextTests
         Assert.True(context.Authorized("read", "User"));
         Assert.True(context.Authorized("read", "User", "id"));
     }
-  
-
 }
