@@ -31,18 +31,18 @@ public class PrivilegeContextBenchmarks
     [Benchmark]
     public bool AuthorizedReadBenchmark()
     {
-        return _authorziationContext.Authorized("read", "Bob");
+        return _authorziationContext.Allowed("read", "Bob");
     }
 
     [Benchmark]
     public bool AuthorizedAllBenchmark()
     {
-        return _authorziationContext.Authorized("delete", "all");
+        return _authorziationContext.Allowed("delete", "all");
     }
 
     [Benchmark]
     public bool AuthorizedFieldBenchmark()
     {
-        return _authorziationContext.Authorized("update", "Allen", "id");
+        return _authorziationContext.Allowed("update", "Allen", "id");
     }
 }

@@ -13,12 +13,12 @@ public class PrivilegedViewTests : TestContext
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "Post")
-            .Add(p => p.ChildContent, _ => "<p>Authorized</p>")
+            .Add(p => p.ChildContent, _ => "<p>Allowed</p>")
         );
 
-        Assert.True(cut.Instance.IsAuthorized);
+        Assert.True(cut.Instance.IsAllowed);
 
-        cut.Find("p").MarkupMatches("<p>Authorized</p>");
+        cut.Find("p").MarkupMatches("<p>Allowed</p>");
     }
 
     [Fact]
@@ -32,13 +32,13 @@ public class PrivilegedViewTests : TestContext
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "Post")
-            .Add(p => p.Authorized, _ => "<p>Authorized</p>")
+            .Add(p => p.Allowed, _ => "<p>Allowed</p>")
             .Add(p => p.Forbidden, _ => "<p>Forbidden</p>")
         );
 
-        Assert.True(cut.Instance.IsAuthorized);
+        Assert.True(cut.Instance.IsAllowed);
 
-        cut.Find("p").MarkupMatches("<p>Authorized</p>");
+        cut.Find("p").MarkupMatches("<p>Allowed</p>");
     }
 
     [Fact]
@@ -52,11 +52,11 @@ public class PrivilegedViewTests : TestContext
             .AddCascadingValue(context)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "Post")
-            .Add(p => p.Authorized, _ => "<p>Authorized</p>")
+            .Add(p => p.Allowed, _ => "<p>Allowed</p>")
             .Add(p => p.Forbidden, _ => "<p>Forbidden</p>")
         );
 
-        Assert.False(cut.Instance.IsAuthorized);
+        Assert.False(cut.Instance.IsAllowed);
 
         cut.Find("p").MarkupMatches("<p>Forbidden</p>");
     }
@@ -72,10 +72,10 @@ public class PrivilegedViewTests : TestContext
             .AddCascadingValue(context)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "Post")
-            .Add(p => p.ChildContent, _ => "<p>Authorized</p>")
+            .Add(p => p.ChildContent, _ => "<p>Allowed</p>")
         );
 
-        Assert.False(cut.Instance.IsAuthorized);
+        Assert.False(cut.Instance.IsAllowed);
 
         cut.MarkupMatches(string.Empty);
     }

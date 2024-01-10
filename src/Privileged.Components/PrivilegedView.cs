@@ -29,10 +29,9 @@ public class PrivilegedView : ComponentBase
     [Parameter] public RenderFragment<PrivilegeContext>? Forbidden { get; set; }
 
     /// <summary>
-    /// The content that will be displayed if the user is authorized.
-    /// If you specify a value for this parameter, do not also specify a value for <see cref="ChildContent"/>.
+    /// The content that will be displayed if the user is allowed.
     /// </summary>
-    [Parameter] public RenderFragment<PrivilegeContext>? Authorized { get; set; }
+    [Parameter] public RenderFragment<PrivilegeContext>? Allowed { get; set; }
 
     /// <summary>
     /// The action to authorize.
@@ -50,19 +49,19 @@ public class PrivilegedView : ComponentBase
     [Parameter] public string? Field { get; set; }
 
     /// <summary>
-    /// Gets or sets weather the specified <see cref="Action"/>, <see cref="Subject"/> and optional <see cref="Field"/> is authorized.
+    /// Gets or sets weather the specified <see cref="Action"/>, <see cref="Subject"/> and optional <see cref="Field"/> is allowed.
     /// </summary>
     /// <value>
-    /// The weather the specified <see cref="Action"/>, <see cref="Subject"/> and optional <see cref="Field"/> is authorized.
+    /// The weather the specified <see cref="Action"/>, <see cref="Subject"/> and optional <see cref="Field"/> is allowed.
     /// </value>
-    public bool? IsAuthorized { get; set; }
+    public bool? IsAllowed { get; set; }
 
     /// <inheritdoc />
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
-        if (IsAuthorized == true)
+        if (IsAllowed == true)
         {
-            var authorized = Authorized ?? ChildContent;
+            var authorized = Allowed ?? ChildContent;
             builder.AddContent(0, authorized?.Invoke(PrivilegeContext!));
         }
         else
@@ -76,9 +75,9 @@ public class PrivilegedView : ComponentBase
     {
         base.OnParametersSet();
 
-        if (ChildContent != null && Authorized != null)
+        if (ChildContent != null && Allowed != null)
         {
-            throw new InvalidOperationException($"Do not specify both '{nameof(Authorized)}' and '{nameof(ChildContent)}'.");
+            throw new InvalidOperationException($"Do not specify both '{nameof(Allowed)}' and '{nameof(ChildContent)}'.");
         }
 
         if (PrivilegeContext == null)
@@ -86,6 +85,6 @@ public class PrivilegedView : ComponentBase
             throw new InvalidOperationException($"PrivilegedView requires a cascading parameter of type PrivilegeContext.");
         }
 
-        IsAuthorized = PrivilegeContext?.Authorized(Action, Subject, Field);
+        IsAllowed = PrivilegeContext?.Allowed(Action, Subject, Field);
     }
 }

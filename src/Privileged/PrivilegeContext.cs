@@ -21,7 +21,7 @@ public class PrivilegeContext(IReadOnlyCollection<PrivilegeRule> rules, StringCo
 
 
     /// <inheritdoc />
-    public bool Authorized(string? action, string? subject, string? field = null)
+    public bool Allowed(string? action, string? subject, string? field = null)
     {
         if (action is null || subject is null)
             return false;
@@ -41,7 +41,7 @@ public class PrivilegeContext(IReadOnlyCollection<PrivilegeRule> rules, StringCo
     }
 
     /// <inheritdoc />
-    public bool Unauthorized(string? action, string? subject, string? field = null) => !Authorized(action, subject, field);
+    public bool Forbidden(string? action, string? subject, string? field = null) => !Allowed(action, subject, field);
 
     /// <inheritdoc />
     public IEnumerable<PrivilegeRule> MatchRules(string? action, string? subject, string? field = null)

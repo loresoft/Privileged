@@ -11,16 +11,16 @@ public class PrivilegeContextTests
             .Forbid("publish", "Post")
             .Build();
 
-        context.Authorized("read", "Post").Should().BeTrue();
-        context.Authorized("update", "Post").Should().BeTrue();
-        context.Authorized("archive", "Post").Should().BeTrue();
-        context.Authorized(null, "Post").Should().BeFalse();
-        context.Authorized("archive", null).Should().BeFalse();
-        context.Authorized("read", "User").Should().BeFalse();
-        context.Authorized("delete", "Post").Should().BeTrue();
-        context.Authorized("publish", "Post").Should().BeFalse();
-        context.Authorized("test", "User").Should().BeTrue();
-        context.Authorized("test", "Post").Should().BeTrue();
+        context.Allowed("read", "Post").Should().BeTrue();
+        context.Allowed("update", "Post").Should().BeTrue();
+        context.Allowed("archive", "Post").Should().BeTrue();
+        context.Allowed(null, "Post").Should().BeFalse();
+        context.Allowed("archive", null).Should().BeFalse();
+        context.Allowed("read", "User").Should().BeFalse();
+        context.Allowed("delete", "Post").Should().BeTrue();
+        context.Allowed("publish", "Post").Should().BeFalse();
+        context.Allowed("test", "User").Should().BeTrue();
+        context.Allowed("test", "Post").Should().BeTrue();
     }
 
     [Fact]
@@ -31,9 +31,9 @@ public class PrivilegeContextTests
             .Allow("update", "Article")
             .Build();
 
-        context.Authorized("read", "Article").Should().BeTrue();
-        context.Authorized("update", "Article").Should().BeTrue();
-        context.Authorized("delete", "Article").Should().BeFalse();
+        context.Allowed("read", "Article").Should().BeTrue();
+        context.Allowed("update", "Article").Should().BeTrue();
+        context.Allowed("delete", "Article").Should().BeFalse();
     }
 
     [Fact]
@@ -43,9 +43,9 @@ public class PrivilegeContextTests
             .Allow(["read", "update"], "Post")
             .Build();
 
-        context.Authorized("read", "Post").Should().BeTrue();
-        context.Authorized("update", "Post").Should().BeTrue();
-        context.Authorized("delete", "Post").Should().BeFalse();
+        context.Allowed("read", "Post").Should().BeTrue();
+        context.Allowed("update", "Post").Should().BeTrue();
+        context.Allowed("delete", "Post").Should().BeFalse();
     }
 
     [Fact]
@@ -55,9 +55,9 @@ public class PrivilegeContextTests
             .Allow("read", ["Post", "User"])
             .Build();
 
-        context.Authorized("read", "Post").Should().BeTrue();
-        context.Authorized("read", "User").Should().BeTrue();
-        context.Authorized("read", "Article").Should().BeFalse();
+        context.Allowed("read", "Post").Should().BeTrue();
+        context.Allowed("read", "User").Should().BeTrue();
+        context.Allowed("read", "Article").Should().BeFalse();
     }
 
     [Fact]
@@ -68,12 +68,12 @@ public class PrivilegeContextTests
             .Allow("read", "User")
             .Build();
 
-        context.Authorized("read", "Post").Should().BeTrue();
-        context.Authorized("read", "Post", "id").Should().BeTrue();
-        context.Authorized("read", "Post", "title").Should().BeTrue();
-        context.Authorized("read", "Post", "ssn").Should().BeFalse();
+        context.Allowed("read", "Post").Should().BeTrue();
+        context.Allowed("read", "Post", "id").Should().BeTrue();
+        context.Allowed("read", "Post", "title").Should().BeTrue();
+        context.Allowed("read", "Post", "ssn").Should().BeFalse();
 
-        context.Authorized("read", "User").Should().BeTrue();
-        context.Authorized("read", "User", "id").Should().BeTrue();
+        context.Allowed("read", "User").Should().BeTrue();
+        context.Allowed("read", "User", "id").Should().BeTrue();
     }
 }

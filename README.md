@@ -38,16 +38,14 @@ var context = new PrivilegeBuilder()
     .Forbid("publish", "Post")
     .Build();
 
-Assert.True(context.Authorized("read", "Post"));
-Assert.True(context.Authorized("update", "Post"));
-Assert.True(context.Authorized("archive", "Post"));
-Assert.False(context.Authorized(null, "Post"));
-Assert.False(context.Authorized("archive", null));
-Assert.False(context.Authorized("read", "User"));
-Assert.True(context.Authorized("delete", "Post"));
-Assert.False(context.Authorized("publish", "Post"));
-Assert.True(context.Authorized("test", "User"));
-Assert.True(context.Authorized("test", "Post"));
+context.Allowed("read", "Post").Should().BeTrue();
+context.Allowed("update", "Post").Should().BeTrue();
+context.Allowed("archive", "Post").Should().BeTrue();
+context.Allowed("read", "User").Should().BeFalse();
+context.Allowed("delete", "Post").Should().BeTrue();
+context.Allowed("publish", "Post").Should().BeFalse();
+context.Allowed("test", "User").Should().BeTrue();
+context.Allowed("test", "Post").Should().BeTrue();
 ```
 
 Using fields
@@ -58,11 +56,11 @@ var context = new PrivilegeBuilder()
     .Allow("read", "User")
     .Build();
 
-Assert.True(context.Authorized("read", "Post"));
-Assert.True(context.Authorized("read", "Post", "id"));
-Assert.True(context.Authorized("read", "Post", "title"));
-Assert.False(context.Authorized("read", "Post", "ssn"));
+context.Allowed("read", "Post").Should().BeTrue();
+context.Allowed("read", "Post", "id").Should().BeTrue();
+context.Allowed("read", "Post", "title").Should().BeTrue();
+context.Allowed("read", "Post", "ssn").Should().BeFalse();
 
-Assert.True(context.Authorized("read", "User"));
-Assert.True(context.Authorized("read", "User", "id"));
+context.Allowed("read", "User").Should().BeTrue();
+context.Allowed("read", "User", "id").Should().BeTrue();
 ```
