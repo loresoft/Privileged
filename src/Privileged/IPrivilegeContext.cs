@@ -1,17 +1,17 @@
 namespace Privileged;
 
 /// <summary>
-/// The authorization context definition used to check privileges
+/// The privilege context definition used to check privileges
 /// </summary>
-public interface IAuthorizationContext
+public interface IPrivilegeContext
 {
     /// <summary>
-    /// Gets the authorization rules for this context.
+    /// Gets the privilege rules for this context.
     /// </summary>
     /// <value>
-    /// The authorization rules for this context.
+    /// The privilege rules for this context.
     /// </value>
-    IReadOnlyCollection<AuthorizationRule> Rules { get; }
+    IReadOnlyCollection<PrivilegeRule> Rules { get; }
 
     /// <summary>
     /// Check if the specified <paramref name="action"/>, <paramref name="subject"/> and <paramref name="field"/> are authorized.
@@ -38,5 +38,5 @@ public interface IAuthorizationContext
     /// <param name="subject">The subject to match.</param>
     /// <param name="field">The optional field to match.</param>
     /// <returns>The rules for the specified <paramref name="action"/>, <paramref name="subject"/> and <paramref name="field"/></returns>
-    IEnumerable<AuthorizationRule> MatchRules(string? action, string? subject, string? field = null);
+    IEnumerable<PrivilegeRule> MatchRules(string? action, string? subject, string? field = null);
 }

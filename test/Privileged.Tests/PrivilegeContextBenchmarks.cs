@@ -5,17 +5,17 @@ using Bogus;
 namespace Privileged.Tests;
 
 [MemoryDiagnoser]
-public class AuthorizationContextBenchmarks
+public class PrivilegeContextBenchmarks
 {
-    private List<AuthorizationRule> _rules;
-    private AuthorizationContext _authorziationContext;
+    private List<PrivilegeRule> _rules;
+    private PrivilegeContext _authorziationContext;
 
-    public AuthorizationContextBenchmarks()
+    public PrivilegeContextBenchmarks()
     {
-        var generator = new Faker<AuthorizationRule>("en_US")
+        var generator = new Faker<PrivilegeRule>("en_US")
             .UseSeed(2024)
             .CustomInstantiator((f) =>
-                new AuthorizationRule
+                new PrivilegeRule
                 (
                     Action: f.Random.WeightedRandom(["read", "update", "delete", "all"], [.40f, .30f, .20f, 10f]),
                     Subject: f.Name.FirstName(),
@@ -25,7 +25,7 @@ public class AuthorizationContextBenchmarks
             );
 
         _rules = generator.Generate(1000);
-        _authorziationContext = new AuthorizationContext(_rules);
+        _authorziationContext = new PrivilegeContext(_rules);
     }
 
     [Benchmark]

@@ -1,11 +1,11 @@
 namespace Privileged;
 
 /// <summary>
-/// An <see cref="AuthorizationContext"/> builder
+/// An <see cref="PrivilegeContext"/> builder
 /// </summary>
-public class AuthorizationBuilder
+public class PrivilegeBuilder
 {
-    private readonly List<AuthorizationRule> _rules = [];
+    private readonly List<PrivilegeRule> _rules = [];
 
     /// <summary>
     /// Create a rule allowing the specified <paramref name="action"/>, <paramref name="subject"/> and optional <paramref name="fields"/>.
@@ -17,7 +17,7 @@ public class AuthorizationBuilder
     /// <exception cref="ArgumentException">
     /// Action or Subject cannot be null or whitespace.
     /// </exception>
-    public AuthorizationBuilder Allow(string action, string subject, IEnumerable<string>? fields = null)
+    public PrivilegeBuilder Allow(string action, string subject, IEnumerable<string>? fields = null)
     {
         if (string.IsNullOrWhiteSpace(action))
             throw new ArgumentException("Action cannot be null or whitespace.", nameof(action));
@@ -25,7 +25,7 @@ public class AuthorizationBuilder
         if (string.IsNullOrWhiteSpace(subject))
             throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
 
-        var rule = new AuthorizationRule(action, subject, fields?.ToList());
+        var rule = new PrivilegeRule(action, subject, fields?.ToList());
         _rules.Add(rule);
 
         return this;
@@ -41,7 +41,7 @@ public class AuthorizationBuilder
     /// <exception cref="ArgumentException">
     /// Action or Subject cannot be null or whitespace.
     /// </exception>
-    public AuthorizationBuilder Forbid(string action, string subject, IEnumerable<string>? fields = null)
+    public PrivilegeBuilder Forbid(string action, string subject, IEnumerable<string>? fields = null)
     {
         if (string.IsNullOrWhiteSpace(action))
             throw new ArgumentException("Action cannot be null or whitespace.", nameof(action));
@@ -49,20 +49,20 @@ public class AuthorizationBuilder
         if (string.IsNullOrWhiteSpace(subject))
             throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
 
-        var rule = new AuthorizationRule(action, subject, fields?.ToList(), true);
+        var rule = new PrivilegeRule(action, subject, fields?.ToList(), true);
         _rules.Add(rule);
 
         return this;
     }
 
     /// <summary>
-    /// Creates the <see cref="AuthorizationContext"/> from the rules specified in <see cref="Allow"/> or <see cref="Forbid"/> methods.
+    /// Creates the <see cref="PrivilegeContext"/> from the rules specified in <see cref="Allow"/> or <see cref="Forbid"/> methods.
     /// </summary>
-    /// <returns>An instance of <see cref="AuthorizationContext"/> with the specified rules</returns>
+    /// <returns>An instance of <see cref="PrivilegeContext"/> with the specified rules</returns>
     /// <seealso cref="Allow"/>
     /// <seealso cref="Forbid"/>
-    public AuthorizationContext Build()
+    public PrivilegeContext Build()
     {
-        return new AuthorizationContext(_rules);
+        return new PrivilegeContext(_rules);
     }
 }

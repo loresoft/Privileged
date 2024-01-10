@@ -17,9 +17,9 @@ public class JsonSerializationTests
     [Fact]
     public void SerializationRules()
     {
-        var context = new AuthorizationBuilder()
-            .Allow("test", AuthorizationSubjects.All)
-            .Allow(AuthorizationActions.All, "Post")
+        var context = new PrivilegeBuilder()
+            .Allow("test", PrivilegeSubjects.All)
+            .Allow(PrivilegeActions.All, "Post")
             .Allow("read", "User", ["title", "id"])
             .Forbid("publish", "Post")
             .Build();
@@ -36,11 +36,11 @@ public class JsonSerializationTests
 
         _output.WriteLine(json);
 
-        var rules = JsonSerializer.Deserialize<List<AuthorizationRule>>(json, options);
+        var rules = JsonSerializer.Deserialize<List<PrivilegeRule>>(json, options);
         rules.Should().NotBeNullOrEmpty();
         rules.Count.Should().Be(4);
 
-        var jsonContext = new AuthorizationContext(rules);
+        var jsonContext = new PrivilegeContext(rules);
         jsonContext.Should().NotBeNull();
 
         var contextJson = JsonSerializer.Serialize(jsonContext, options);
@@ -48,8 +48,8 @@ public class JsonSerializationTests
     }
 }
 
-[JsonSerializable(typeof(AuthorizationContext))]
-[JsonSerializable(typeof(AuthorizationRule))]
-[JsonSerializable(typeof(List<AuthorizationRule>))]
-[JsonSerializable(typeof(IReadOnlyCollection<AuthorizationRule>))]
+[JsonSerializable(typeof(PrivilegeContext))]
+[JsonSerializable(typeof(PrivilegeRule))]
+[JsonSerializable(typeof(List<PrivilegeRule>))]
+[JsonSerializable(typeof(IReadOnlyCollection<PrivilegeRule>))]
 public partial class AuthorizationJsonContext : JsonSerializerContext;

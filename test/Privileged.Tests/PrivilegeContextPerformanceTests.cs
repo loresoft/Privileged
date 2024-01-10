@@ -8,11 +8,11 @@ using Xunit.Abstractions;
 
 namespace Privileged.Tests;
 
-public class AuthorizationContextPerformanceTests
+public class PrivilegeContextPerformanceTests
 {
     private readonly ITestOutputHelper _output;
 
-    public AuthorizationContextPerformanceTests(ITestOutputHelper output)
+    public PrivilegeContextPerformanceTests(ITestOutputHelper output)
     {
         _output = output;
     }
@@ -26,7 +26,7 @@ public class AuthorizationContextPerformanceTests
             .WithOptions(ConfigOptions.DisableOptimizationsValidator)
             .WithOption(ConfigOptions.JoinSummary, true);
 
-        var summary = BenchmarkRunner.Run<AuthorizationContextBenchmarks>(config);
+        var summary = BenchmarkRunner.Run<PrivilegeContextBenchmarks>(config);
 
         // write benchmark summary
         var logger = new AccumulationLogger();

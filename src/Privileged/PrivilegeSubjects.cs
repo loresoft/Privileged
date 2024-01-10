@@ -1,9 +1,9 @@
 namespace Privileged;
 
 /// <summary>
-/// Authorization subject defaults
+/// Privilege subject defaults
 /// </summary>
-public static class AuthorizationSubjects
+public static class PrivilegeSubjects
 {
     /// <summary>
     /// Special keyword represents any subjects will be matched

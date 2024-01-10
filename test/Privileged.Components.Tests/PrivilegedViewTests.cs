@@ -5,7 +5,7 @@ public class PrivilegedViewTests : TestContext
     [Fact]
     public void AuthorizedChildContent()
     {
-        var context = new AuthorizationBuilder()
+        var context = new PrivilegeBuilder()
             .Allow("read", "Post")
             .Build();
 
@@ -24,7 +24,7 @@ public class PrivilegedViewTests : TestContext
     [Fact]
     public void AuthorizedAuthorizedContent()
     {
-        var context = new AuthorizationBuilder()
+        var context = new PrivilegeBuilder()
             .Allow("read", "Post")
             .Build();
 
@@ -44,7 +44,7 @@ public class PrivilegedViewTests : TestContext
     [Fact]
     public void AuthorizedForbiddenContent()
     {
-        var context = new AuthorizationBuilder()
+        var context = new PrivilegeBuilder()
             .Allow("read", "Post")
             .Build();
 
@@ -64,7 +64,7 @@ public class PrivilegedViewTests : TestContext
     [Fact]
     public void AuthorizedForbiddenChildContent()
     {
-        var context = new AuthorizationBuilder()
+        var context = new PrivilegeBuilder()
             .Allow("read", "Post")
             .Build();
 

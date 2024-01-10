@@ -4,29 +4,35 @@ using Microsoft.AspNetCore.Components.Rendering;
 namespace Privileged.Components;
 
 /// <summary>
-/// Displays differing content depending on the user's Privileged authorization status.
+/// Displays differing content depending on the user's privilege status.
 /// </summary>
-/// <seealso cref="Privileged.AuthorizationContext"/>
+/// <seealso cref="Privileged.PrivilegeContext"/>
 public class PrivilegedView : ComponentBase
 {
 
-    [CascadingParameter] private AuthorizationContext? AuthorizationContext { get; set; }
+    /// <summary>
+    /// Gets or sets the privilege context.
+    /// </summary>
+    /// <value>
+    /// The privilege context.
+    /// </value>
+    [CascadingParameter] protected PrivilegeContext? PrivilegeContext { get; set; }
 
     /// <summary>
     /// The content that will be displayed if the user is authorized.
     /// </summary>
-    [Parameter] public RenderFragment<AuthorizationContext>? ChildContent { get; set; }
+    [Parameter] public RenderFragment<PrivilegeContext>? ChildContent { get; set; }
 
     /// <summary>
     /// The content that will be displayed if the user is not authorized.
     /// </summary>
-    [Parameter] public RenderFragment<AuthorizationContext>? Forbidden { get; set; }
+    [Parameter] public RenderFragment<PrivilegeContext>? Forbidden { get; set; }
 
     /// <summary>
     /// The content that will be displayed if the user is authorized.
     /// If you specify a value for this parameter, do not also specify a value for <see cref="ChildContent"/>.
     /// </summary>
-    [Parameter] public RenderFragment<AuthorizationContext>? Authorized { get; set; }
+    [Parameter] public RenderFragment<PrivilegeContext>? Authorized { get; set; }
 
     /// <summary>
     /// The action to authorize.
@@ -43,6 +49,12 @@ public class PrivilegedView : ComponentBase
     /// </summary>
     [Parameter] public string? Field { get; set; }
 
+    /// <summary>
+    /// Gets or sets weather the specified <see cref="Action"/>, <see cref="Subject"/> and optional <see cref="Field"/> is authorized.
+    /// </summary>
+    /// <value>
+    /// The weather the specified <see cref="Action"/>, <see cref="Subject"/> and optional <see cref="Field"/> is authorized.
+    /// </value>
     public bool? IsAuthorized { get; set; }
 
     /// <inheritdoc />
@@ -51,11 +63,11 @@ public class PrivilegedView : ComponentBase
         if (IsAuthorized == true)
         {
             var authorized = Authorized ?? ChildContent;
-            builder.AddContent(0, authorized?.Invoke(AuthorizationContext!));
+            builder.AddContent(0, authorized?.Invoke(PrivilegeContext!));
         }
         else
         {
-            builder.AddContent(0, Forbidden?.Invoke(AuthorizationContext!));
+            builder.AddContent(0, Forbidden?.Invoke(PrivilegeContext!));
         }
     }
 
@@ -69,11 +81,11 @@ public class PrivilegedView : ComponentBase
             throw new InvalidOperationException($"Do not specify both '{nameof(Authorized)}' and '{nameof(ChildContent)}'.");
         }
 
-        if (AuthorizationContext == null)
+        if (PrivilegeContext == null)
         {
-            throw new InvalidOperationException($"PrivilegedView requires a cascading parameter of type AuthorizationContext.");
+            throw new InvalidOperationException($"PrivilegedView requires a cascading parameter of type PrivilegeContext.");
         }
 
-        IsAuthorized = AuthorizationContext?.Authorized(Action, Subject, Field);
+        IsAuthorized = PrivilegeContext?.Authorized(Action, Subject, Field);
     }
 }

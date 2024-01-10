@@ -1,15 +1,13 @@
-using System.Text.Json;
-
 namespace Privileged.Tests;
 
-public class AuthorizationContextTests
+public class PrivilegeContextTests
 {
     [Fact]
     public void AllowByDefault()
     {
-        var context = new AuthorizationBuilder()
-            .Allow("test", AuthorizationSubjects.All)
-            .Allow(AuthorizationActions.All, "Post")
+        var context = new PrivilegeBuilder()
+            .Allow("test", PrivilegeSubjects.All)
+            .Allow(PrivilegeActions.All, "Post")
             .Forbid("publish", "Post")
             .Build();
 
@@ -28,7 +26,7 @@ public class AuthorizationContextTests
     [Fact]
     public void AllowConstructRules()
     {
-        var context = new AuthorizationBuilder()
+        var context = new PrivilegeBuilder()
             .Allow("read", "Article")
             .Allow("update", "Article")
             .Build();
@@ -41,7 +39,7 @@ public class AuthorizationContextTests
     [Fact]
     public void AllowSpecifyMultipleActions()
     {
-        var context = new AuthorizationBuilder()
+        var context = new PrivilegeBuilder()
             .Allow(["read", "update"], "Post")
             .Build();
 
@@ -53,7 +51,7 @@ public class AuthorizationContextTests
     [Fact]
     public void AllowSpecifyMultipleSubjects()
     {
-        var context = new AuthorizationBuilder()
+        var context = new PrivilegeBuilder()
             .Allow("read", ["Post", "User"])
             .Build();
 
@@ -65,7 +63,7 @@ public class AuthorizationContextTests
     [Fact]
     public void AllowRulesWithFields()
     {
-        var context = new AuthorizationBuilder()
+        var context = new PrivilegeBuilder()
             .Allow("read", "Post", ["title", "id"])
             .Allow("read", "User")
             .Build();

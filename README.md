@@ -32,9 +32,9 @@ Privileged operates on rules for what a user can actually do in the application.
 Using builder to create rules
 
 ```c#
-var context = new AuthorizationBuilder()
-    .Allow("test", AuthorizationSubjects.All)
-    .Allow(AuthorizationActions.All, "Post")
+var context = new PrivilegeBuilder()
+    .Allow("test", PrivilegeSubjects.All)
+    .Allow(PrivilegeActions.All, "Post")
     .Forbid("publish", "Post")
     .Build();
 
@@ -53,7 +53,7 @@ Assert.True(context.Authorized("test", "Post"));
 Using fields
 
 ```c#
-var context = new AuthorizationBuilder()
+var context = new PrivilegeBuilder()
     .Allow("read", "Post", ["title", "id"])
     .Allow("read", "User")
     .Build();
