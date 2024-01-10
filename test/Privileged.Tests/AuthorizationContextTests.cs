@@ -1,3 +1,5 @@
+using System.Text.Json;
+
 namespace Privileged.Tests;
 
 public class AuthorizationContextTests
@@ -11,16 +13,16 @@ public class AuthorizationContextTests
             .Forbid("publish", "Post")
             .Build();
 
-        Assert.True(context.Authorized("read", "Post"));
-        Assert.True(context.Authorized("update", "Post"));
-        Assert.True(context.Authorized("archive", "Post"));
-        Assert.False(context.Authorized(null, "Post"));
-        Assert.False(context.Authorized("archive", null));
-        Assert.False(context.Authorized("read", "User"));
-        Assert.True(context.Authorized("delete", "Post"));
-        Assert.False(context.Authorized("publish", "Post"));
-        Assert.True(context.Authorized("test", "User"));
-        Assert.True(context.Authorized("test", "Post"));
+        context.Authorized("read", "Post").Should().BeTrue();
+        context.Authorized("update", "Post").Should().BeTrue();
+        context.Authorized("archive", "Post").Should().BeTrue();
+        context.Authorized(null, "Post").Should().BeFalse();
+        context.Authorized("archive", null).Should().BeFalse();
+        context.Authorized("read", "User").Should().BeFalse();
+        context.Authorized("delete", "Post").Should().BeTrue();
+        context.Authorized("publish", "Post").Should().BeFalse();
+        context.Authorized("test", "User").Should().BeTrue();
+        context.Authorized("test", "Post").Should().BeTrue();
     }
 
     [Fact]
@@ -31,9 +33,9 @@ public class AuthorizationContextTests
             .Allow("update", "Article")
             .Build();
 
-        Assert.True(context.Authorized("read", "Article"));
-        Assert.True(context.Authorized("update", "Article"));
-        Assert.False(context.Authorized("delete", "Article"));
+        context.Authorized("read", "Article").Should().BeTrue();
+        context.Authorized("update", "Article").Should().BeTrue();
+        context.Authorized("delete", "Article").Should().BeFalse();
     }
 
     [Fact]
@@ -43,9 +45,9 @@ public class AuthorizationContextTests
             .Allow(["read", "update"], "Post")
             .Build();
 
-        Assert.True(context.Authorized("read", "Post"));
-        Assert.True(context.Authorized("update", "Post"));
-        Assert.False(context.Authorized("delete", "Post"));
+        context.Authorized("read", "Post").Should().BeTrue();
+        context.Authorized("update", "Post").Should().BeTrue();
+        context.Authorized("delete", "Post").Should().BeFalse();
     }
 
     [Fact]
@@ -55,9 +57,9 @@ public class AuthorizationContextTests
             .Allow("read", ["Post", "User"])
             .Build();
 
-        Assert.True(context.Authorized("read", "Post"));
-        Assert.True(context.Authorized("read", "User"));
-        Assert.False(context.Authorized("read", "Article"));
+        context.Authorized("read", "Post").Should().BeTrue();
+        context.Authorized("read", "User").Should().BeTrue();
+        context.Authorized("read", "Article").Should().BeFalse();
     }
 
     [Fact]
@@ -68,12 +70,12 @@ public class AuthorizationContextTests
             .Allow("read", "User")
             .Build();
 
-        Assert.True(context.Authorized("read", "Post"));
-        Assert.True(context.Authorized("read", "Post", "id"));
-        Assert.True(context.Authorized("read", "Post", "title"));
-        Assert.False(context.Authorized("read", "Post", "ssn"));
+        context.Authorized("read", "Post").Should().BeTrue();
+        context.Authorized("read", "Post", "id").Should().BeTrue();
+        context.Authorized("read", "Post", "title").Should().BeTrue();
+        context.Authorized("read", "Post", "ssn").Should().BeFalse();
 
-        Assert.True(context.Authorized("read", "User"));
-        Assert.True(context.Authorized("read", "User", "id"));
+        context.Authorized("read", "User").Should().BeTrue();
+        context.Authorized("read", "User", "id").Should().BeTrue();
     }
 }
