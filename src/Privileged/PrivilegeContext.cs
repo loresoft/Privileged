@@ -55,19 +55,19 @@ public class PrivilegeContext(IReadOnlyCollection<PrivilegeRule> rules, StringCo
 
     private bool RuleMatcher(PrivilegeRule rule, string action, string subject, string? field = null)
     {
-        return SubjectMather(rule, subject)
-               && ActionMather(rule, action)
+        return SubjectMatcher(rule, subject)
+               && ActionMatcher(rule, action)
                && FieldMatcher(rule, field);
     }
 
-    private bool SubjectMather(PrivilegeRule rule, string subject)
+    private bool SubjectMatcher(PrivilegeRule rule, string subject)
     {
         // can match global all or requested subject
         return StringComparer.Equals(rule.Subject, subject)
                || StringComparer.Equals(rule.Subject, PrivilegeSubjects.All);
     }
 
-    private bool ActionMather(PrivilegeRule rule, string action)
+    private bool ActionMatcher(PrivilegeRule rule, string action)
     {
         // can match global manage action or requested action
         return StringComparer.Equals(rule.Action, action)
