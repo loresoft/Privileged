@@ -5,7 +5,7 @@ env:
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
   DOTNET_ENVIRONMENT: github
   ASPNETCORE_ENVIRONMENT: github
-  BUILD_PATH: '${{github.workspace}}/artifacts'
+  BUILD_PATH: "${{github.workspace}}/artifacts"
   COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
 
 on:
@@ -14,7 +14,7 @@ on:
       - main
       - develop
     tags:
-      - 'v*'
+      - "v*"
   pull_request:
     branches:
       - main
@@ -30,8 +30,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Install .NET Core
-        uses: actions/setup-dotnet@v3
+      - name: Install .NET
+        uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
             6.0.x
@@ -55,11 +55,11 @@ jobs:
 
       - name: Create Packages
         if: success() && github.event_name != 'pull_request'
-        run: dotnet pack --configuration Release --include-symbols --include-source --no-build --output "${{env.BUILD_PATH}}"
+        run: dotnet pack --configuration Release --no-build --output "${{env.BUILD_PATH}}"
 
       - name: Upload Packages
         if: success() && github.event_name != 'pull_request'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: packages
           path: "${{env.BUILD_PATH}}"
@@ -71,7 +71,7 @@ jobs:
 
     steps:
       - name: Download Artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           name: packages
 
@@ -96,4 +96,3 @@ jobs:
             echo "${0##*/}": Pushing $package...
             dotnet nuget push $package --source https://api.nuget.org/v3/index.json --api-key ${{ secrets.NUGET_KEY }} --skip-duplicate
           done
-

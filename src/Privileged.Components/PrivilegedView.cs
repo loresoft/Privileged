@@ -66,7 +66,7 @@ public class PrivilegedView : ComponentBase
         }
         else
         {
-            builder.AddContent(0, Forbidden?.Invoke(PrivilegeContext!));
+            builder.AddContent(1, Forbidden?.Invoke(PrivilegeContext!));
         }
     }
 
