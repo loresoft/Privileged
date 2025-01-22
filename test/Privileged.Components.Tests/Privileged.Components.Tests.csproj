@@ -15,7 +15,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="bunit" Version="1.38.5" />
-		<PackageReference Include="FluentAssertions" Version="8.0.0" />
+		<PackageReference Include="FluentAssertions" Version="8.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="8.0.12" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
 		<PackageReference Include="coverlet.collector" Version="6.0.4">
