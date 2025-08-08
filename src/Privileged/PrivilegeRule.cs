@@ -4,29 +4,32 @@ namespace Privileged;
 /// Represents a privilege authorization rule used to determine access rights
 /// based on a subject, action, and optional qualifiers. The rule can either allow or deny access.
 /// </summary>
-/// <param name="Action">
-/// The action to match for this rule (e.g., "Read", "Write", "Delete").
-/// </param>
-/// <param name="Subject">
-/// The subject to match for this rule (e.g., "Document", "User", etc.).
-/// This typically refers to the resource or entity being accessed.
-/// </param>
-/// <param name="Qualifiers">
-/// An optional list of qualifiers that provide additional context for the rule
-/// (e.g., fields, specific tags, tenant IDs, or ownership constraints). If <c>null</c> or empty,
-/// the rule applies regardless of qualifier.
-/// </param>
-/// <param name="Denied">
-/// A value indicating whether this rule denies access. If <c>true</c>, the rule explicitly denies the action.
-/// If <c>false</c> or <c>null</c>, the rule allows the action.
-/// </param>
-public readonly record struct PrivilegeRule(
-    string Action,
-    string Subject,
-    IReadOnlyCollection<string>? Qualifiers = null,
-    bool? Denied = null
-)
+public readonly record struct PrivilegeRule
 {
+    /// <summary>
+    /// The action to match for this rule (e.g., "Read", "Write", "Delete").
+    /// </summary>
+    public string Action { get; init; }
+
+    /// <summary>
+    /// The subject to match for this rule (e.g., "Document", "User", etc.).
+    /// This typically refers to the resource or entity being accessed.
+    /// </summary>
+    public string Subject { get; init; }
+
+    /// <summary>
+    /// An optional list of qualifiers that provide additional context for the rule
+    /// (e.g., fields, specific tags, tenant IDs, or ownership constraints). If <c>null</c> or empty,
+    /// the rule applies regardless of qualifier.
+    /// </summary>
+    public IReadOnlyCollection<string>? Qualifiers { get; init; }
+
+    /// <summary>
+    /// A value indicating whether this rule denies access. If <c>true</c>, the rule explicitly denies the action.
+    /// If <c>false</c> or <c>null</c>, the rule allows the action.
+    /// </summary>
+    public bool? Denied { get; init; }
+
     /// <summary>
     /// Computes a hash code for the <see cref="PrivilegeAlias"/> based on its properties.
     /// </summary>

@@ -1,14 +1,14 @@
-using System;
-using System.Collections.Generic;
 using BenchmarkDotNet.Attributes;
+
+using Privileged.Benchmarks.Optimizations;
 
 namespace Privileged.Benchmarks;
 
 [MemoryDiagnoser]
-public class PrivilegeContextBenchmark
+public class OriginalContextBenchmark
 {
-    private PrivilegeContext _contextWithAliases = null!;
-    private PrivilegeContext _contextWithoutAliases = null!;
+    private PrivilegeContextOriginal _contextWithAliases = null!;
+    private PrivilegeContextOriginal _contextWithoutAliases = null!;
 
     [GlobalSetup]
     public void Setup()
@@ -29,8 +29,8 @@ public class PrivilegeContextBenchmark
             new PrivilegeAlias { Alias = "entity", Values = ["Post", "User"], Type = PrivilegeMatch.Subject }
         };
 
-        _contextWithAliases = new PrivilegeContext(rules, aliases);
-        _contextWithoutAliases = new PrivilegeContext(rules);
+        _contextWithAliases = new PrivilegeContextOriginal(rules, aliases);
+        _contextWithoutAliases = new PrivilegeContextOriginal(rules);
     }
 
     [Benchmark]
@@ -57,5 +57,4 @@ public class PrivilegeContextBenchmark
     {
         return _contextWithoutAliases.Forbidden("delete", "Post", "content");
     }
-
 }

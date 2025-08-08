@@ -142,7 +142,12 @@ public class PrivilegeBuilder
             throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
 
         var qualifierSet = qualifiers != null ? new HashSet<string>(qualifiers, _stringComparer) : null;
-        var rule = new PrivilegeRule(action, subject, qualifierSet);
+        var rule = new PrivilegeRule
+        {
+            Action = action,
+            Subject = subject,
+            Qualifiers = qualifierSet
+        };
         _rules.Add(rule);
 
         return this;
@@ -200,7 +205,13 @@ public class PrivilegeBuilder
             throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
 
         var qualifierSet = qualifiers != null ? new HashSet<string>(qualifiers, _stringComparer) : null;
-        var rule = new PrivilegeRule(action, subject, qualifierSet, true);
+        var rule = new PrivilegeRule
+        {
+            Action = action,
+            Subject = subject,
+            Qualifiers = qualifierSet,
+            Denied = true
+        };
         _rules.Add(rule);
 
         return this;
@@ -263,7 +274,7 @@ public class PrivilegeBuilder
             throw new ArgumentNullException(nameof(values));
 
         var aliasValues = new HashSet<string>(values, _stringComparer);
-        var privilegeAlias = new PrivilegeAlias(alias, aliasValues, type);
+        var privilegeAlias = new PrivilegeAlias { Alias = alias, Values = aliasValues, Type = type };
         _aliases.Add(privilegeAlias);
 
         return this;

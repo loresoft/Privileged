@@ -1,4 +1,3 @@
-# build-and-run-benchmarks.ps1
 # Ensure the script stops on errors
 $ErrorActionPreference = "Stop"
 
