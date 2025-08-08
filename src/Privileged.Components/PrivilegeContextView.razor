@@ -1,0 +1,38 @@
+@using Privileged.Components
+@using Microsoft.AspNetCore.Components
+
+<CascadingValue Value="PrivilegeContext">
+    @if (PrivilegeContext is null)
+    {
+        @Loading
+    }
+    else if(Loaded is not null)
+    {
+        @Loaded
+    }
+    else if (ChildContent is not null)
+    {
+        @ChildContent
+    }
+</CascadingValue>
+
+@code {
+    [Inject]
+    protected IPrivilegeContextProvider Provider { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment? Loading { get; set; } = builder => builder.AddContent(0, (MarkupString)"Loading ...");
+
+    [Parameter]
+    public RenderFragment? Loaded { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    protected PrivilegeContext? PrivilegeContext { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        PrivilegeContext = await Provider.GetContextAsync();
+    }
+}

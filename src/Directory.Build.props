@@ -1,7 +1,7 @@
 <Project>
 
   <PropertyGroup Label="Package">
-    <Description>An isomorphic authorization library for restricting resources by action, subjct and fields</Description>
+    <Description>An authorization library for restricting resources by action, subjct and fields</Description>
     <Copyright>Copyright © $([System.DateTime]::Now.ToString(yyyy)) LoreSoft</Copyright>
     <Authors>LoreSoft</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>

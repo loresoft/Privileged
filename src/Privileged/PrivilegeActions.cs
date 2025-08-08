@@ -1,12 +1,13 @@
 namespace Privileged;
 
 /// <summary>
-/// Privilege action defaults
+/// Provides default constants for privilege actions.
 /// </summary>
 public static class PrivilegeActions
 {
     /// <summary>
-    /// Special keyword represents any action will be matched
+    /// A special keyword indicating that the rule applies to all actions.
+    /// When used in a rule, it matches any action value.
     /// </summary>
-    public const string All = "all";
+    public const string All = "*";
 }

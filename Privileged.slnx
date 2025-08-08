@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/Build/">
+    <File Path=".github/workflows/dotnet.yml" />
+    <File Path="README.md" />
+    <File Path="src/Directory.Build.props" />
+  </Folder>
+  <Folder Name="/Samples/">
+    <Project Path="samples/Sample.Application/Sample.Application.Client/Sample.Application.Client.csproj" Id="4fcd084e-f14e-4872-bb38-3fb46eb5a228" />
+    <Project Path="samples/Sample.Application/Sample.Application/Sample.Application.csproj" Id="228d1441-d94e-4ff8-aee0-20c416934de6" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="test/Privileged.Components.Tests/Privileged.Components.Tests.csproj" />
+    <Project Path="test/Privileged.Tests/Privileged.Tests.csproj" />
+  </Folder>
+  <Project Path="src/Privileged.Components/Privileged.Components.csproj" />
+  <Project Path="src/Privileged/Privileged.csproj" />
+</Solution>

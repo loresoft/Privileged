@@ -1,0 +1,155 @@
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Forms;
+
+namespace Privileged.Components.Tests;
+
+public class PrivilegeInputTextTests : TestContext
+{
+    [Fact]
+    public void Renders_Text_Input_When_Read_And_Update_Allowed()
+    {
+        var model = new TestModel { Name = "John" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Allow("read", nameof(TestModel), [nameof(TestModel.Name)])
+            .Allow("update", nameof(TestModel), [nameof(TestModel.Name)])
+            .Build();
+
+        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Name)
+            .Add(p => p.ValueExpression, () => model.Name)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
+            .Add(p => p.Subject, nameof(TestModel))
+            .Add(p => p.Field, nameof(TestModel.Name))
+        );
+
+        var input = cut.Find("input");
+        // For text inputs, the type attribute may not be explicitly set since "text" is the default
+        var type = input.GetAttribute("type") ?? "text";
+        type.Should().Be("text");
+        input.HasAttribute("readonly").Should().BeFalse();
+    }
+
+    [Fact]
+    public void Sets_Readonly_When_Read_Allowed_Update_Denied()
+    {
+        var model = new TestModel { Name = "John" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Allow("read", nameof(TestModel), [nameof(TestModel.Name)])
+            .Build(); // no update rule
+
+        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Name)
+            .Add(p => p.ValueExpression, () => model.Name)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
+            .Add(p => p.Subject, nameof(TestModel))
+            .Add(p => p.Field, nameof(TestModel.Name))
+        );
+
+        var input = cut.Find("input");
+        // For text inputs, the type attribute may not be explicitly set since "text" is the default
+        var type = input.GetAttribute("type") ?? "text";
+        type.Should().Be("text");
+        input.HasAttribute("readonly").Should().BeTrue();
+    }
+
+    [Fact]
+    public void Masks_When_Read_Denied_Update_Denied()
+    {
+        var model = new TestModel { Name = "Secret" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder().Build(); // no rules
+
+        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Name)
+            .Add(p => p.ValueExpression, () => model.Name)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
+            .Add(p => p.Subject, nameof(TestModel))
+            .Add(p => p.Field, nameof(TestModel.Name))
+        );
+
+        var input = cut.Find("input");
+        input.GetAttribute("type").Should().Be("password");
+        input.HasAttribute("disabled").Should().BeTrue();
+    }
+
+    [Fact]
+    public void Masks_When_Update_Allowed_But_Read_Denied()
+    {
+        var model = new TestModel { Name = "Secret" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Allow("update", nameof(TestModel), [nameof(TestModel.Name)])
+            .Build(); // only update
+
+        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Name)
+            .Add(p => p.ValueExpression, () => model.Name)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
+            .Add(p => p.Subject, nameof(TestModel))
+            .Add(p => p.Field, nameof(TestModel.Name))
+        );
+
+        var input = cut.Find("input");
+        input.GetAttribute("type").Should().Be("password");
+    }
+
+    [Fact]
+    public void Falls_Back_To_Model_Name_For_Subject_And_Name_For_Field_When_Not_Set()
+    {
+        var model = new TestModel { Name = "John" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Allow("read", nameof(TestModel))
+            .Allow("update", nameof(TestModel))
+            .Build();
+
+        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Name)
+            .Add(p => p.ValueExpression, () => model.Name)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
+        // Intentionally not setting Subject and Field - should fallback to model name and name attribute
+        );
+
+        var input = cut.Find("input");
+        // For text inputs, the type attribute may not be explicitly set since "text" is the default
+        var type = input.GetAttribute("type") ?? "text";
+        type.Should().Be("text");
+        input.HasAttribute("readonly").Should().BeFalse();
+
+        // Verify the input has a name attribute (which would be used as the field fallback)
+        input.HasAttribute("name").Should().BeTrue();
+    }
+
+    [Fact]
+    public void Throws_When_No_PrivilegeContext_Provided()
+    {
+        var model = new TestModel { Name = "John" };
+        var editContext = new EditContext(model);
+
+        var exception = Assert.Throws<System.InvalidOperationException>(() =>
+        {
+            RenderComponent<PrivilegeInputText>(ps => ps
+                .AddCascadingValue(editContext)
+                .Add(p => p.Value, model.Name)
+                .Add(p => p.ValueExpression, () => model.Name)
+                .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
+                .Add(p => p.Subject, nameof(TestModel))
+                .Add(p => p.Field, nameof(TestModel.Name))
+            );
+        });
+
+        exception.Message.Should().Contain("PrivilegeContext");
+    }
+}

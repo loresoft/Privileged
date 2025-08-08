@@ -1,6 +1,6 @@
 namespace Privileged.Components.Tests;
 
-public class PrivilegedViewTests : TestContext
+public class PrivilegeViewTests : TestContext
 {
     [Fact]
     public void AuthorizedChildContent()
@@ -9,7 +9,7 @@ public class PrivilegedViewTests : TestContext
             .Allow("read", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegedView>(parameters => parameters
+        var cut = RenderComponent<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "Post")
@@ -28,7 +28,7 @@ public class PrivilegedViewTests : TestContext
             .Allow("read", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegedView>(parameters => parameters
+        var cut = RenderComponent<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "Post")
@@ -48,7 +48,7 @@ public class PrivilegedViewTests : TestContext
             .Allow("read", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegedView>(parameters => parameters
+        var cut = RenderComponent<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "Post")
@@ -68,7 +68,7 @@ public class PrivilegedViewTests : TestContext
             .Allow("read", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegedView>(parameters => parameters
+        var cut = RenderComponent<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "Post")

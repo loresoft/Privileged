@@ -1,0 +1,135 @@
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Components.Forms
+@using Privileged
+@using Privileged.Components
+
+@if (Context is null)
+{
+    <p><em>No privilege context available.</em></p>
+}
+else
+{
+    <h3>Context Rules</h3>
+    <table class="table table-sm table-striped">
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Subject</th>
+                <th>Qualifiers</th>
+                <th>Denied</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Context.Rules)
+            {
+                <tr>
+                    <td>@r.Action</td>
+                    <td>@r.Subject</td>
+                    <td>@string.Join(", ", r.Qualifiers ?? Enumerable.Empty<string>())</td>
+                    <td>@r.Denied</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (Context.Aliases.Count > 0)
+    {
+        <h4>Aliases</h4>
+        <ul>
+            @foreach (var a in Context.Aliases)
+            {
+                <li><strong>@a.Alias</strong> (@a.Type): @string.Join(", ", a.Values)</li>
+            }
+        </ul>
+    }
+
+    <h3 class="mt-4">Conditional View Example</h3>
+    <PrivilegeView Action="update" Subject="Product" Field="Title" Allowed="CanUpdateTitle" Forbidden="CannotUpdateTitle" />
+
+    <h3 class="mt-4">Privilege Aware Form</h3>
+    <EditForm Model="Model" OnValidSubmit="OnSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row g-3">
+            <div class="col-md-6">
+                <label class="form-label">Title</label>
+                <PrivilegeInputText class="form-control" @bind-Value="Model.Title" Subject="Product" Field="Title" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Summary</label>
+                <PrivilegeInputTextArea class="form-control" @bind-Value="Model.Summary" Subject="Product" Field="Summary" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">Cost</label>
+                <PrivilegeInputNumber TValue="decimal" class="form-control" @bind-Value="Model.Cost" Subject="Product" Field="Cost" />
+            </div>
+            <div class="col-md-8">
+                <label class="form-label">Internal Notes</label>
+                <PrivilegeInputTextArea class="form-control" @bind-Value="Model.InternalNotes" Subject="Product" Field="InternalNotes" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Save</button>
+    </EditForm>
+
+    <h4 class="mt-4">Permission Matrix (Product)</h4>
+    <table class="table table-bordered w-auto">
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Read</th>
+                <th>Update</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var field in new[] { "Title", "Summary", "Cost", "InternalNotes" })
+            {
+                <tr>
+                    <td>@field</td>
+                    <td>@AllowedState("read", "Product", field)</td>
+                    <td>@AllowedState("update", "Product", field)</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [CascadingParameter]
+    public PrivilegeContext? Context { get; set; }
+
+    private ProductModel Model { get; } = new();
+
+    private Task OnSubmit() => Task.CompletedTask;
+
+    private string AllowedState(string action, string subject, string? field = null)
+        => Context?.Allowed(action, subject, field) == true ? "✔" : "✘";
+
+    // Render fragments for conditional view
+    private RenderFragment<PrivilegeContext> CanUpdateTitle => ctx => builder =>
+    {
+        builder.OpenElement(0, "p");
+        builder.AddAttribute(1, "class", "text-success");
+        builder.AddContent(2, "You can update the Product Title.");
+        builder.CloseElement();
+    };
+
+    private RenderFragment<PrivilegeContext> CannotUpdateTitle => ctx => builder =>
+    {
+        builder.OpenElement(0, "p");
+        builder.AddAttribute(1, "class", "text-danger");
+        builder.AddContent(2, "You cannot update the Product Title.");
+        builder.CloseElement();
+    };
+
+    public class ProductModel
+    {
+        [Required]
+        public string Title { get; set; } = "Sample Product";
+        [Required]
+        public string Summary { get; set; } = "Summary goes here";
+        public decimal Cost { get; set; } = 42.5m;
+        public string InternalNotes { get; set; } = "Secret stuff";
+    }
+}
