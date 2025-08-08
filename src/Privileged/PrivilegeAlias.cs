@@ -17,11 +17,7 @@ namespace Privileged;
 /// </param>
 public readonly record struct PrivilegeAlias(
     string Alias,
-#if NET5_0_OR_GREATER
-    IReadOnlySet<string> Values,
-#else
-    ISet<string> Values,
-#endif
+    IReadOnlyCollection<string> Values,
     PrivilegeMatch Type = PrivilegeMatch.Action
 )
 {

@@ -23,11 +23,7 @@ namespace Privileged;
 public readonly record struct PrivilegeRule(
     string Action,
     string Subject,
-#if NET5_0_OR_GREATER
-    IReadOnlySet<string>? Qualifiers = null,
-#else
-    ISet<string>? Qualifiers = null,
-#endif
+    IReadOnlyCollection<string>? Qualifiers = null,
     bool? Denied = null
 )
 {

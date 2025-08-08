@@ -9,6 +9,7 @@
     <Project Path="samples/Sample.Application/Sample.Application/Sample.Application.csproj" Id="228d1441-d94e-4ff8-aee0-20c416934de6" />
   </Folder>
   <Folder Name="/Tests/">
+    <Project Path="test/Privileged.Benchmarks/Privileged.Benchmarks.csproj" Id="f6d8913f-9793-45c1-92c8-8f897e1e49a5" />
     <Project Path="test/Privileged.Components.Tests/Privileged.Components.Tests.csproj" />
     <Project Path="test/Privileged.Tests/Privileged.Tests.csproj" />
   </Folder>
