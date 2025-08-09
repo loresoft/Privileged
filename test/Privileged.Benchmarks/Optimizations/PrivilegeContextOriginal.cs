@@ -16,8 +16,8 @@ public class PrivilegeContextOriginal : IPrivilegeContext
     }
 
     public PrivilegeContextOriginal(
-        IReadOnlyCollection<PrivilegeRule> rules,
-        IReadOnlyCollection<PrivilegeAlias>? aliases = null,
+        IReadOnlyList<PrivilegeRule> rules,
+        IReadOnlyList<PrivilegeAlias>? aliases = null,
         StringComparer? stringComparer = null)
     {
         Rules = rules ?? throw new ArgumentNullException(nameof(rules));
@@ -25,9 +25,9 @@ public class PrivilegeContextOriginal : IPrivilegeContext
         StringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
     }
 
-    public IReadOnlyCollection<PrivilegeRule> Rules { get; }
+    public IReadOnlyList<PrivilegeRule> Rules { get; }
 
-    public IReadOnlyCollection<PrivilegeAlias> Aliases { get; }
+    public IReadOnlyList<PrivilegeAlias> Aliases { get; }
 
     public StringComparer StringComparer { get; }
 
@@ -52,12 +52,12 @@ public class PrivilegeContextOriginal : IPrivilegeContext
 
     public bool Forbidden(string? action, string? subject, string? qualifier = null) => !Allowed(action, subject, qualifier);
 
-    public IEnumerable<PrivilegeRule> MatchRules(string? action, string? subject, string? qualifier = null)
+    public IReadOnlyList<PrivilegeRule> MatchRules(string? action, string? subject, string? qualifier = null)
     {
         if (action is null || subject is null)
             return [];
 
-        return Rules.Where(r => RuleMatcher(r, action, subject, qualifier));
+        return Rules.Where(r => RuleMatcher(r, action, subject, qualifier)).ToList();
     }
 
     private bool RuleMatcher(PrivilegeRule rule, string action, string subject, string? qualifier = null)

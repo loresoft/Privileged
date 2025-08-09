@@ -22,7 +22,7 @@ public readonly record struct PrivilegeRule
     /// (e.g., fields, specific tags, tenant IDs, or ownership constraints). If <c>null</c> or empty,
     /// the rule applies regardless of qualifier.
     /// </summary>
-    public IReadOnlyCollection<string>? Qualifiers { get; init; }
+    public IReadOnlyList<string>? Qualifiers { get; init; }
 
     /// <summary>
     /// A value indicating whether this rule denies access. If <c>true</c>, the rule explicitly denies the action.
@@ -42,8 +42,8 @@ public readonly record struct PrivilegeRule
 
         if (Qualifiers != null)
         {
-            foreach (var qualifier in Qualifiers)
-                hash.Add(qualifier);
+            for (int index = 0; index < Qualifiers.Count; index++)
+                hash.Add(Qualifiers[index]);
         }
 
         hash.Add(Denied);

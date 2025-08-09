@@ -25,19 +25,24 @@ namespace Privileged;
 /// <example>
 /// The following example demonstrates creating and using a <see cref="PrivilegeContext"/>:
 /// <code>
-/// var rules = new[]
+/// var rules = new List&lt;PrivilegeRule&gt;
 /// {
 ///     new PrivilegeRule { Action = "read", Subject = "Post" },
-///     new PrivilegeRule { Action = "write", Subject = "Post", Qualifiers = new[] { "title", "content" } },
+///     new PrivilegeRule { Action = "write", Subject = "Post", Qualifiers = new List&lt;string&gt; { "title", "content" } },
 ///     new PrivilegeRule { Action = "delete", Subject = "Post", Denied = true }
 /// };
 ///
-/// var model = new PrivilegeModel(rules);
+/// var aliases = new List&lt;PrivilegeAlias&gt;
+/// {
+///     new PrivilegeAlias { Alias = "Manage", Values = new List&lt;string&gt; { "create", "update", "delete" }, Type = PrivilegeMatch.Action }
+/// };
+///
+/// var model = new PrivilegeModel { Rules = rules, Aliases = aliases };
 /// var context = new PrivilegeContext(model);
 ///
 /// bool canRead = context.Allowed("read", "Post");             // true
 /// bool canWrite = context.Allowed("write", "Post", "title");  // true
-/// bool canDelete = context.Allowed("delete", "Post");         // false
+/// bool canDelete = context.Forbidden("delete", "Post");       // true
 /// </code>
 /// </example>
 /// <seealso cref="IPrivilegeContext" />
@@ -46,6 +51,9 @@ namespace Privileged;
 /// <seealso cref="PrivilegeAlias" />
 public class PrivilegeContext : IPrivilegeContext
 {
+    private readonly Dictionary<int, bool> _allowedCache;
+    private readonly Dictionary<(string Alias, PrivilegeMatch Type), HashSet<string>> _aliasCache;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PrivilegeContext"/> class using a privilege model.
     /// </summary>
@@ -66,20 +74,31 @@ public class PrivilegeContext : IPrivilegeContext
     /// <param name="stringComparer">An optional string comparer for rule matching. Defaults to <see cref="StringComparer.InvariantCultureIgnoreCase"/>.</param>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="rules"/> is <c>null</c>.</exception>
     public PrivilegeContext(
-        IReadOnlyCollection<PrivilegeRule> rules,
-        IReadOnlyCollection<PrivilegeAlias>? aliases = null,
+        IReadOnlyList<PrivilegeRule> rules,
+        IReadOnlyList<PrivilegeAlias>? aliases = null,
         StringComparer? stringComparer = null)
     {
         Rules = rules ?? throw new ArgumentNullException(nameof(rules));
         Aliases = aliases ?? [];
         StringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
+
+        _allowedCache = [];
+        _aliasCache = [];
+
+        // compute alias HashSets for faster lookups
+        foreach (var alias in Aliases)
+        {
+            var key = (alias.Alias, alias.Type);
+            if (!_aliasCache.ContainsKey(key))
+                _aliasCache[key] = new HashSet<string>(alias.Values, StringComparer);
+        }
     }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<PrivilegeRule> Rules { get; }
+    public IReadOnlyList<PrivilegeRule> Rules { get; }
 
     /// <inheritdoc />
-    public IReadOnlyCollection<PrivilegeAlias> Aliases { get; }
+    public IReadOnlyList<PrivilegeAlias> Aliases { get; }
 
     /// <summary>
     /// Gets the <see cref="StringComparer"/> used to match actions, subjects, and qualifiers.
@@ -106,18 +125,33 @@ public class PrivilegeContext : IPrivilegeContext
         if (action is null || subject is null)
             return false;
 
+        // Generate cache key
+        int cacheKey = HashCode.Combine(action, subject, qualifier);
+
+        // Check if result is already cached
+        if (_allowedCache.TryGetValue(cacheKey, out bool cachedResult))
+            return cachedResult;
+
+        // Perform privilege check
         var matchedRules = MatchRules(action, subject, qualifier);
         bool? state = null;
 
-        foreach (var matchedRule in matchedRules)
+        for (int i = 0; i < matchedRules.Count; i++)
         {
+            PrivilegeRule matchedRule = matchedRules[i];
+
             if (matchedRule.Denied == true)
                 state = state != null && (state.Value && false);
             else
                 state = state == null || (state.Value || true);
         }
 
-        return state ?? false;
+        bool result = state ?? false;
+
+        // Cache the result
+        _allowedCache[cacheKey] = result;
+
+        return result;
     }
 
     /// <inheritdoc />
@@ -130,7 +164,8 @@ public class PrivilegeContext : IPrivilegeContext
     /// <returns>
     /// <c>true</c> if the specified action is explicitly denied for the subject and qualifier; otherwise, <c>false</c>.
     /// </returns>
-    public bool Forbidden(string? action, string? subject, string? qualifier = null) => !Allowed(action, subject, qualifier);
+    public bool Forbidden(string? action, string? subject, string? qualifier = null)
+        => !Allowed(action, subject, qualifier);
 
     /// <inheritdoc />
     /// <summary>
@@ -143,13 +178,24 @@ public class PrivilegeContext : IPrivilegeContext
     /// A collection of <see cref="PrivilegeRule"/> instances that match the specified criteria.
     /// </returns>
     /// <exception cref="ArgumentNullException">Thrown when <paramref name="action"/> or <paramref name="subject"/> is <c>null</c>.</exception>
-    public IEnumerable<PrivilegeRule> MatchRules(string? action, string? subject, string? qualifier = null)
+    public IReadOnlyList<PrivilegeRule> MatchRules(string? action, string? subject, string? qualifier = null)
     {
         if (action is null || subject is null)
             return [];
 
-        return Rules.Where(r => RuleMatcher(r, action, subject, qualifier));
+        var matchedRules = new List<PrivilegeRule>();
+
+        for (int r = 0; r < Rules.Count; r++)
+        {
+            if (!RuleMatcher(Rules[r], action, subject, qualifier))
+                continue;
+
+            matchedRules.Add(Rules[r]);
+        }
+
+        return matchedRules;
     }
+
 
     private bool RuleMatcher(PrivilegeRule rule, string action, string subject, string? qualifier = null)
     {
@@ -160,54 +206,67 @@ public class PrivilegeContext : IPrivilegeContext
 
     private bool SubjectMatcher(PrivilegeRule rule, string subject)
     {
-        // can match global all or requested subject
-        return StringComparer.Equals(rule.Subject, subject)
-               || StringComparer.Equals(rule.Subject, PrivilegeSubjects.All)
-               || AliasMatcher(rule.Subject, subject, PrivilegeMatch.Subject);
+        // Direct match optimization
+        if (StringComparer.Equals(rule.Subject, subject))
+            return true;
+
+        // wildcard match optimization
+        if (StringComparer.Equals(rule.Subject, PrivilegeSubjects.All))
+            return true;
+
+        // Alias match
+        return AliasMatcher(rule.Subject, subject, PrivilegeMatch.Subject);
     }
 
     private bool ActionMatcher(PrivilegeRule rule, string action)
     {
-        // can match global manage action or requested action
-        return StringComparer.Equals(rule.Action, action)
-               || StringComparer.Equals(rule.Action, PrivilegeActions.All)
-               || AliasMatcher(rule.Action, action, PrivilegeMatch.Action);
+        // Direct match optimization
+        if (StringComparer.Equals(rule.Action, action))
+            return true;
+
+        // wildcard match optimization
+        if (StringComparer.Equals(rule.Action, PrivilegeActions.All))
+            return true;
+
+        // Alias match
+        return AliasMatcher(rule.Action, action, PrivilegeMatch.Action);
     }
 
     private bool QualifierMatcher(PrivilegeRule rule, string? qualifier)
     {
-        // if rule doesn't have qualifiers, all allowed
+        // Early exit if no qualifier is provided or rule has no qualifiers
         if (qualifier == null || rule.Qualifiers == null || rule.Qualifiers.Count == 0)
             return true;
 
-        // ensure rule matches qualifier
-        return rule.Qualifiers.Contains(qualifier, StringComparer)
-               || AliasMatcher(rule.Qualifiers, qualifier, PrivilegeMatch.Qualifier);
-    }
+        // Direct match
+        if (rule.Qualifiers.Contains(qualifier, StringComparer))
+            return true;
 
-    private bool AliasMatcher(string name, string value, PrivilegeMatch privilegeType)
-    {
-        if (Aliases == null || Aliases.Count == 0)
-            return false;
-
-        return Aliases
-            .Any(a =>
-                StringComparer.Equals(a.Alias, name)
-                && a.Type == privilegeType
-                && a.Values.Contains(value, StringComparer)
-            );
+        // Alias match
+        return AliasMatcher(rule.Qualifiers, qualifier, PrivilegeMatch.Qualifier);
     }
 
     private bool AliasMatcher(IEnumerable<string> names, string value, PrivilegeMatch privilegeType)
     {
-        if (Aliases == null || Aliases.Count == 0)
+        if (_aliasCache.Count == 0)
             return false;
 
-        return Aliases
-            .Any(a =>
-                names.Contains(a.Alias, StringComparer)
-                && a.Type == privilegeType
-                && a.Values.Contains(value, StringComparer)
-            );
+        foreach (var name in names)
+        {
+            var key = (name, privilegeType);
+            if (_aliasCache.TryGetValue(key, out var valueSet) && valueSet.Contains(value))
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool AliasMatcher(string name, string value, PrivilegeMatch privilegeType)
+    {
+        if (_aliasCache.Count == 0)
+            return false;
+
+        var key = (name, privilegeType);
+        return _aliasCache.TryGetValue(key, out var valueSet) && valueSet.Contains(value);
     }
 }

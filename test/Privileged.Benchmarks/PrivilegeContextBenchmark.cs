@@ -45,6 +45,13 @@ public class PrivilegeContextBenchmark
         return _contextWithAliases.Forbidden("modify", "entity", "content");
     }
 
+    [Benchmark]
+    public int BenchmarkMatchRulesWithAlias()
+    {
+        var result = _contextWithAliases.MatchRules("modify", "entity", "content");
+        return result.Count;
+    }
+
 
     [Benchmark]
     public bool BenchmarkAllowedWithoutAlias()
@@ -56,6 +63,13 @@ public class PrivilegeContextBenchmark
     public bool BenchmarkForbiddenWithoutAlias()
     {
         return _contextWithoutAliases.Forbidden("delete", "Post", "content");
+    }
+
+    [Benchmark]
+    public int BenchmarkMatchRulesWithoutAlias()
+    {
+        var result = _contextWithoutAliases.MatchRules("modify", "entity", "content");
+        return result.Count;
     }
 
 }

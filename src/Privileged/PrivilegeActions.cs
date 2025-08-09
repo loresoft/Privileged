@@ -1,7 +1,7 @@
 namespace Privileged;
 
 /// <summary>
-/// Provides default constants for privilege actions.
+/// Provides default constants for privilege actions used in authorization rules.
 /// </summary>
 public static class PrivilegeActions
 {

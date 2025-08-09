@@ -17,20 +17,39 @@
 </CascadingValue>
 
 @code {
+    /// <summary>
+    /// Gets or sets the provider for retrieving the privilege context.
+    /// </summary>
     [Inject]
     protected IPrivilegeContextProvider Provider { get; set; } = default!;
 
+    /// <summary>
+    /// Gets or sets the render fragment to display while the privilege context is loading.
+    /// </summary>
     [Parameter]
     public RenderFragment? Loading { get; set; } = builder => builder.AddContent(0, (MarkupString)"Loading ...");
 
+    /// <summary>
+    /// Gets or sets the render fragment to display when the privilege context is loaded.
+    /// </summary>
     [Parameter]
     public RenderFragment? Loaded { get; set; }
 
+    /// <summary>
+    /// Gets or sets the child content to render within the privilege context.
+    /// </summary>
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
+    /// <summary>
+    /// Gets or sets the privilege context used for evaluating privilege rules.
+    /// </summary>
     protected PrivilegeContext? PrivilegeContext { get; set; }
 
+    /// <summary>
+    /// Asynchronously initializes the privilege context by retrieving it from the provider.
+    /// </summary>
+    /// <returns>A task that represents the asynchronous initialization operation.</returns>
     protected override async Task OnInitializedAsync()
     {
         PrivilegeContext = await Provider.GetContextAsync();

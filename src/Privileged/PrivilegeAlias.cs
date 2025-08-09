@@ -14,7 +14,7 @@ public readonly record struct PrivilegeAlias()
     /// <summary>
     /// A list of actual values that this alias expands to (e.g., ["read", "create", "update"]).
     /// </summary>
-    public required IReadOnlyCollection<string> Values { get; init; }
+    public required IReadOnlyList<string> Values { get; init; }
 
     /// <summary>
     /// The type of match this alias applies to (e.g., <see cref="PrivilegeMatch.Subject"/> for subjects,

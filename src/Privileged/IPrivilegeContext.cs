@@ -11,7 +11,7 @@ public interface IPrivilegeContext
     /// <value>
     /// A read-only collection of <see cref="PrivilegeRule"/> instances representing the authorization rules.
     /// </value>
-    IReadOnlyCollection<PrivilegeRule> Rules { get; }
+    IReadOnlyList<PrivilegeRule> Rules { get; }
 
     /// <summary>
     /// Gets the collection of privilege aliases defined for this context.
@@ -19,7 +19,7 @@ public interface IPrivilegeContext
     /// <value>
     /// A read-only collection of <see cref="PrivilegeAlias"/> instances used for rule aliasing or mapping.
     /// </value>
-    IReadOnlyCollection<PrivilegeAlias> Aliases { get; }
+    IReadOnlyList<PrivilegeAlias> Aliases { get; }
 
     /// <summary>
     /// Determines whether the specified action is allowed for the given subject and qualifier.
@@ -52,6 +52,6 @@ public interface IPrivilegeContext
     /// <returns>
     /// A collection of <see cref="PrivilegeRule"/> instances that match the specified criteria.
     /// </returns>
-    IEnumerable<PrivilegeRule> MatchRules(string? action, string? subject, string? qualifier = null);
+    IReadOnlyList<PrivilegeRule> MatchRules(string? action, string? subject, string? qualifier = null);
 }
 

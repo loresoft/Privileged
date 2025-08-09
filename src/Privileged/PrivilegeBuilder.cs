@@ -26,18 +26,18 @@ namespace Privileged;
 ///     .Forbid("delete", "User")                 // Forbid deleting users
 ///     .Build();
 ///
-/// bool canRead = context.Allowed("read", "Post");     // true
-/// bool canDelete = context.Forbidden("delete", "User"); // true
+/// bool canRead = context.Allowed("read", "Post");         // true
+/// bool canDelete = context.Forbidden("delete", "User");   // true
 /// </code>
 ///
 /// <para>Advanced usage with aliases and qualifiers:</para>
 /// <code>
 /// var context = new PrivilegeBuilder()
-///     .Alias("Manage", ["Create", "Update", "Delete"], PrivilegeMatch.Action)
-///     .Allow("Manage", "Project")                         // Allows all actions defined in the "Manage" alias
-///     .Allow("Read", "User")                              // Allows reading User
-///     .Allow("Update", "User", ["Profile", "Settings"])   // Allows updating User's Profile and Settings
-///     .Forbid("Delete", "User")                           // Forbids deleting User
+///     .Alias("Manage", new[] { "Create", "Update", "Delete" }, PrivilegeMatch.Action)
+///     .Allow("Manage", "Project")                                 // Allows all actions defined in the "Manage" alias
+///     .Allow("Read", "User")                                      // Allows reading User
+///     .Allow("Update", "User", new[] { "Profile", "Settings" })   // Allows updating User's Profile and Settings
+///     .Forbid("Delete", "User")                                   // Forbids deleting User
 ///     .Build();
 ///
 /// bool canCreateProject = context.Allowed("Create", "Project");           // true
@@ -125,10 +125,10 @@ public class PrivilegeBuilder
     /// <example>
     /// <code>
     /// var builder = new PrivilegeBuilder()
-    ///     .Allow("read", "Post")                           // Basic rule
-    ///     .Allow("edit", "Post", ["title", "content"])     // Rule with qualifiers
-    ///     .Allow(PrivilegeActions.All, "Comment")          // Wildcard action
-    ///     .Allow("manage", PrivilegeSubjects.All);         // Wildcard subject
+    ///     .Allow("read", "Post")                                  // Basic rule
+    ///     .Allow("edit", "Post", new[] { "title", "content" })    // Rule with qualifiers
+    ///     .Allow(PrivilegeActions.All, "Comment")                 // Wildcard action
+    ///     .Allow("manage", PrivilegeSubjects.All);                // Wildcard subject
     /// </code>
     /// </example>
     /// <seealso cref="Forbid(string, string, IEnumerable{string}?)"/>
@@ -141,7 +141,7 @@ public class PrivilegeBuilder
         if (string.IsNullOrWhiteSpace(subject))
             throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
 
-        var qualifierSet = qualifiers != null ? new HashSet<string>(qualifiers, _stringComparer) : null;
+        var qualifierSet = qualifiers?.ToList();
         var rule = new PrivilegeRule
         {
             Action = action,
@@ -204,7 +204,7 @@ public class PrivilegeBuilder
         if (string.IsNullOrWhiteSpace(subject))
             throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
 
-        var qualifierSet = qualifiers != null ? new HashSet<string>(qualifiers, _stringComparer) : null;
+        var qualifierSet = qualifiers?.ToList();
         var rule = new PrivilegeRule
         {
             Action = action,
@@ -273,8 +273,13 @@ public class PrivilegeBuilder
         if (values == null)
             throw new ArgumentNullException(nameof(values));
 
-        var aliasValues = new HashSet<string>(values, _stringComparer);
-        var privilegeAlias = new PrivilegeAlias { Alias = alias, Values = aliasValues, Type = type };
+        var aliasValues = values.ToList();
+        var privilegeAlias = new PrivilegeAlias
+        {
+            Alias = alias,
+            Values = aliasValues,
+            Type = type
+        };
         _aliases.Add(privilegeAlias);
 
         return this;
