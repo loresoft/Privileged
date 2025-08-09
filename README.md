@@ -9,10 +9,10 @@ API services, and database queries.
 [![License](https://img.shields.io/github/license/loresoft/Privileged.svg)](https://github.com/loresoft/Privileged/blob/main/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/loresoft/Privileged/badge.svg?branch=main)](https://coveralls.io/github/loresoft/Privileged?branch=main)
 
-| Package                                                                        | Version                                                                                                                     | Description                                                   |
-| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
-| [Privileged](https://www.nuget.org/packages/Privileged/)                       | [![NuGet](https://img.shields.io/nuget/v/Privileged.svg)](https://www.nuget.org/packages/Privileged/)                       | Server-side HMAC authentication for ASP.NET Core applications |
-| [Privileged.Components](https://www.nuget.org/packages/Privileged.Components/) | [![NuGet](https://img.shields.io/nuget/v/Privileged.Components.svg)](https://www.nuget.org/packages/Privileged.Components/) | Client-side HTTP message handler for HMAC authentication      |
+| Package                                                                        | Version                                                                                                                     | Description                                           |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| [Privileged](https://www.nuget.org/packages/Privileged/)                       | [![NuGet](https://img.shields.io/nuget/v/Privileged.svg)](https://www.nuget.org/packages/Privileged/)                       | Core authorization library for rule-based permissions |
+| [Privileged.Components](https://www.nuget.org/packages/Privileged.Components/) | [![NuGet](https://img.shields.io/nuget/v/Privileged.Components.svg)](https://www.nuget.org/packages/Privileged.Components/) | Blazor components for privilege-aware UI elements     |
 
 ## Installation
 

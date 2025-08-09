@@ -1,12 +1,12 @@
 <Project>
 
   <PropertyGroup Label="Package">
-    <Description>An authorization library for restricting resources by action, subjct and fields</Description>
+    <Description>An authorization library for restricting resources by action, subject and qualifiers with rule-based permissions</Description>
     <Copyright>Copyright © $([System.DateTime]::Now.ToString(yyyy)) LoreSoft</Copyright>
     <Authors>LoreSoft</Authors>
     <NeutralLanguage>en-US</NeutralLanguage>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <PackageTags>authorization;auth;privilege</PackageTags>
+    <PackageTags>authorization;auth;privilege;permissions;security;access-control;rule-based;blazor;policy;field-level</PackageTags>
     <PackageProjectUrl>https://github.com/loresoft/Privileged</PackageProjectUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <PackageIcon>logo.png</PackageIcon>
