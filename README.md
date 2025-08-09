@@ -204,11 +204,97 @@ For scenarios where you need to load the privilege context asynchronously, use t
 </PrivilegeContextView>
 ```
 
-This component requires an `IPrivilegeContextProvider` service to be registered:
+PrivilegeContextView component requires an `IPrivilegeContextProvider` service to be registered:
 
 ```csharp
 // In Program.cs
 builder.Services.AddScoped<IPrivilegeContextProvider, YourPrivilegeContextProvider>();
+```
+
+#### Using PrivilegeContextView in a Layout
+
+The most common pattern is to wrap your entire layout with `PrivilegeContextView` to ensure permissions are loaded before any page content is rendered:
+
+```razor
+@* MainLayout.razor *@
+@inherits LayoutComponentBase
+
+<div class="page">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+    <main>
+        <PrivilegeContextView>
+            @Body
+        </PrivilegeContextView>
+    </main>
+</div>
+```
+
+With this approach, all pages will automatically have access to the privilege context, and users will see a loading state until permissions are loaded. Your navigation menu can also use privilege checking:
+
+### IPrivilegeContextProvider Implementation
+
+The `IPrivilegeContextProvider` interface allows you to load privilege contexts asynchronously, which is useful for scenarios where permissions are loaded from external sources like APIs, databases, or authentication systems.
+
+Here's how to implement a custom provider:
+
+```csharp
+public class RemotePrivilegeContextProvider : IPrivilegeContextProvider
+{
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<RemotePrivilegeContextProvider> _logger;
+
+    public RemotePrivilegeContextProvider(
+        HttpClient httpClient, 
+        ILogger<RemotePrivilegeContextProvider> logger)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+    }
+
+    public async ValueTask<PrivilegeContext> GetContextAsync()
+    {
+        try
+        {
+            // Load privilege model from API
+            var privilegeModel = await _httpClient.GetFromJsonAsync<PrivilegeModel>("/api/user/privileges");
+            return new PrivilegeContext(privilegeModel)
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load user privileges");
+            
+            // Return minimal context with basic read permissions as fallback
+            return new PrivilegeBuilder()
+                .Allow("read", "Public")
+                .Build();
+        }
+    }
+}
+
+// Register the provider in Program.cs
+builder.Services.AddScoped<IPrivilegeContextProvider, RemotePrivilegeContextProvider>();
+```
+
+For simpler scenarios, you can create a static provider:
+
+```csharp
+public class StaticPrivilegeContextProvider : IPrivilegeContextProvider
+{
+    public ValueTask<PrivilegeContext> GetContextAsync()
+    {
+        var context = new PrivilegeBuilder()
+            .Allow("read", "Post")
+            .Allow("write", "Post", ["title", "content"])
+            .Allow("delete", "Post")
+            .Forbid("publish", "Post") // Override specific action
+            .Build();
+        
+        return ValueTask.FromResult(context);
+    }
+}
 ```
 
 ### PrivilegedView Component
@@ -242,7 +328,7 @@ Use the `PrivilegedView` component to conditionally render content:
 
 ### Cascading Parameters
 
-The component requires a `PrivilegeContext` cascading parameter:
+The PrivilegedView component requires a `PrivilegeContext` cascading parameter:
 
 ```razor
 <CascadingValue Value="@privilegeContext">
@@ -255,6 +341,8 @@ The component requires a `PrivilegeContext` cascading parameter:
 ### Privilege-Aware Input Components
 
 The `Privileged.Components` package also includes privilege-aware input components that automatically handle read/write permissions:
+
+The input components require a `PrivilegeContext` cascading parameter.
 
 ```razor
 @* Text input that becomes read-only based on permissions *@
