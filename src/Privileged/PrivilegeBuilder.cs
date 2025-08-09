@@ -67,6 +67,59 @@ public class PrivilegeBuilder
     private StringComparer _stringComparer = StringComparer.InvariantCultureIgnoreCase;
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="PrivilegeBuilder"/> class with empty rules and aliases.
+    /// </summary>
+    public PrivilegeBuilder()
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PrivilegeBuilder"/> class with the specified rules, aliases, and string comparer.
+    /// </summary>
+    /// <param name="rules">
+    /// The initial collection of privilege rules to include in the builder.
+    /// Cannot be null.
+    /// </param>
+    /// <param name="aliases">
+    /// An optional collection of privilege aliases to include in the builder.
+    /// If null, no aliases are added initially.
+    /// </param>
+    /// <param name="stringComparer">
+    /// An optional string comparer for matching privilege names.
+    /// If null, defaults to <see cref="StringComparer.InvariantCultureIgnoreCase"/>.
+    /// </param>
+    public PrivilegeBuilder(IEnumerable<PrivilegeRule> rules, IEnumerable<PrivilegeAlias>? aliases = null, StringComparer? stringComparer = null)
+    {
+        if (rules == null)
+            throw new ArgumentNullException(nameof(rules));
+
+        _rules = rules.ToList();
+        _aliases = aliases?.ToList() ?? [];
+        _stringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PrivilegeBuilder"/> class from an existing <see cref="PrivilegeModel"/>.
+    /// </summary>
+    /// <param name="model">
+    /// The privilege model containing rules and aliases to initialize the builder with.
+    /// Cannot be null.
+    /// </param>
+    /// <param name="stringComparer">
+    /// An optional string comparer for matching privilege names.
+    /// If null, defaults to <see cref="StringComparer.InvariantCultureIgnoreCase"/>.
+    /// </param>
+    public PrivilegeBuilder(PrivilegeModel model, StringComparer? stringComparer = null)
+    {
+        if (model == null)
+            throw new ArgumentNullException(nameof(model));
+
+        _rules = model.Rules.ToList();
+        _aliases = model.Aliases.ToList();
+        _stringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
+    }
+
+    /// <summary>
     /// Sets the <see cref="StringComparer"/> to use for matching privilege names.
     /// </summary>
     /// <param name="comparer">
@@ -286,6 +339,36 @@ public class PrivilegeBuilder
     }
 
     /// <summary>
+    /// Merges the current rules and aliases with those from the provided <see cref="PrivilegeModel" />.
+    /// Removes duplicates based on action, subject, and qualifiers for rules, and alias name for aliases.
+    /// </summary>
+    /// <param name="model">The <see cref="PrivilegeModel" /> containing rules and aliases to merge.</param>
+    /// <returns>The current <see cref="PrivilegeBuilder" /> instance for method chaining.</returns>
+    public PrivilegeBuilder Merge(PrivilegeModel model)
+    {
+        if (model == null)
+            throw new ArgumentNullException(nameof(model));
+
+        // Merge rules, removing duplicates
+        var existingRules = new HashSet<PrivilegeRule>(_rules);
+        foreach (var rule in model.Rules)
+        {
+            if (!existingRules.Contains(rule))
+                _rules.Add(rule);
+        }
+
+        // Merge aliases, removing duplicates by alias name
+        var existingAliases = new HashSet<PrivilegeAlias>(_aliases);
+        foreach (var alias in model.Aliases)
+        {
+            if (!existingAliases.Contains(alias))
+                _aliases.Add(alias);
+        }
+
+        return this;
+    }
+
+    /// <summary>
     /// Builds and returns a new <see cref="PrivilegeContext"/> instance containing all configured rules and aliases.
     /// </summary>
     /// <returns>
@@ -325,4 +408,5 @@ public class PrivilegeBuilder
     {
         return new PrivilegeContext(_rules, _aliases, _stringComparer);
     }
+
 }

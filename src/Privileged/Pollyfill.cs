@@ -1,44 +1,10 @@
 #if NETSTANDARD2_0
 namespace System
 {
-    internal struct HashCode
+    namespace Diagnostics.CodeAnalysis
     {
-        private int _hash;
-
-        public void Add<T>(T value)
-        {
-            int valueHash = value?.GetHashCode() ?? 0;
-            _hash = (_hash * 31) + valueHash;
-        }
-
-        public readonly int ToHashCode() => _hash;
-
-        public static int Combine<T1, T2>(T1 value1, T2 value2)
-        {
-            var hash = new HashCode();
-            hash.Add(value1);
-            hash.Add(value2);
-            return hash.ToHashCode();
-        }
-
-        public static int Combine<T1, T2, T3>(T1 value1, T2 value2, T3 value3)
-        {
-            var hash = new HashCode();
-            hash.Add(value1);
-            hash.Add(value2);
-            hash.Add(value3);
-            return hash.ToHashCode();
-        }
-
-        public static int Combine<T1, T2, T3, T4>(T1 value1, T2 value2, T3 value3, T4 value4)
-        {
-            var hash = new HashCode();
-            hash.Add(value1);
-            hash.Add(value2);
-            hash.Add(value3);
-            hash.Add(value4);
-            return hash.ToHashCode();
-        }
+        [AttributeUsage(AttributeTargets.Constructor, AllowMultiple = false, Inherited = false)]
+        internal sealed class SetsRequiredMembersAttribute : Attribute;
     }
 
     namespace Runtime.CompilerServices

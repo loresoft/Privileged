@@ -62,8 +62,24 @@ public class PrivilegeContext : IPrivilegeContext
     public PrivilegeContext(
         PrivilegeModel model,
         StringComparer? stringComparer = null)
-        : this(model.Rules, model.Aliases, stringComparer)
     {
+        if (model is null)
+            throw new ArgumentNullException(nameof(model));
+
+        Rules = model.Rules ?? [];
+        Aliases = model.Aliases ?? [];
+        StringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
+
+        _allowedCache = [];
+        _aliasCache = [];
+
+        // compute alias HashSets for faster lookups
+        foreach (var alias in Aliases)
+        {
+            var key = (alias.Alias, alias.Type);
+            if (!_aliasCache.ContainsKey(key))
+                _aliasCache[key] = new HashSet<string>(alias.Values, StringComparer);
+        }
     }
 
     /// <summary>
@@ -125,8 +141,8 @@ public class PrivilegeContext : IPrivilegeContext
         if (action is null || subject is null)
             return false;
 
-        // Generate cache key
-        int cacheKey = HashCode.Combine(action, subject, qualifier);
+        // Generate cache key using local method
+        int cacheKey = CreateCacheKey(action, subject, qualifier);
 
         // Check if result is already cached
         if (_allowedCache.TryGetValue(cacheKey, out bool cachedResult))
@@ -234,21 +250,32 @@ public class PrivilegeContext : IPrivilegeContext
 
     private bool QualifierMatcher(PrivilegeRule rule, string? qualifier)
     {
-        // Early exit if no qualifier is provided or rule has no qualifiers
-        if (qualifier == null || rule.Qualifiers == null || rule.Qualifiers.Count == 0)
+        var hasValue = !string.IsNullOrWhiteSpace(qualifier);
+        var hasQualifiers = rule.Qualifiers?.Count > 0;
+
+        // No qualifier specified in rule or request
+        if (!hasValue && !hasQualifiers)
             return true;
 
+        // Qualifier specified in request but not in rule
+        if (hasValue && !hasQualifiers)
+            return true;
+
+        // No qualifier specified in request but required by rule
+        if (!hasValue && hasQualifiers)
+            return false;
+
         // Direct match
-        if (rule.Qualifiers.Contains(qualifier, StringComparer))
+        if (rule.Qualifiers?.Contains(qualifier, StringComparer) == true)
             return true;
 
         // Alias match
         return AliasMatcher(rule.Qualifiers, qualifier, PrivilegeMatch.Qualifier);
     }
 
-    private bool AliasMatcher(IEnumerable<string> names, string value, PrivilegeMatch privilegeType)
+    private bool AliasMatcher(IEnumerable<string>? names, string? value, PrivilegeMatch privilegeType)
     {
-        if (_aliasCache.Count == 0)
+        if (_aliasCache.Count == 0 || names is null || value is null)
             return false;
 
         foreach (var name in names)
@@ -261,12 +288,30 @@ public class PrivilegeContext : IPrivilegeContext
         return false;
     }
 
-    private bool AliasMatcher(string name, string value, PrivilegeMatch privilegeType)
+    private bool AliasMatcher(string? name, string? value, PrivilegeMatch privilegeType)
     {
-        if (_aliasCache.Count == 0)
+        if (_aliasCache.Count == 0 || name is null || value is null)
             return false;
 
         var key = (name, privilegeType);
         return _aliasCache.TryGetValue(key, out var valueSet) && valueSet.Contains(value);
     }
+
+    private static int CreateCacheKey(string action, string subject, string? qualifier)
+    {
+#if NET5_0_OR_GREATER
+        return HashCode.Combine(action, subject, qualifier);
+#else
+        unchecked
+        {
+            int hash = 17;
+            hash = (hash * 31) + action.GetHashCode();
+            hash = (hash * 31) + subject.GetHashCode();
+            hash = (hash * 31) + (qualifier?.GetHashCode() ?? 0);
+
+            return hash;
+        }
+#endif
+    }
+
 }

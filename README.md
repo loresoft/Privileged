@@ -163,6 +163,47 @@ context.Allowed("read", "Post", "summary").Should().BeTrue();
 context.Allowed("read", "Post", "content").Should().BeFalse();
 ```
 
+## Rule Evaluation
+
+### Rule Precedence
+
+Rules are evaluated in the order they are defined, with more specific rules taking precedence:
+
+1. **Forbid rules** always take precedence over allow rules when both match
+2. Rules are matched based on exact string comparison (case-insensitive by default)
+3. Wildcard rules (`PrivilegeActions.All`, `PrivilegeSubjects.All`) match any value
+4. Alias expansion happens during rule matching
+
+### String Comparison
+
+By default, rule matching uses `StringComparer.InvariantCultureIgnoreCase`. You can customize this:
+
+```csharp
+var context = new PrivilegeContext(rules, aliases, StringComparer.Ordinal);
+```
+
+## API Reference
+
+### PrivilegeBuilder
+
+- `Allow(string action, string subject, IEnumerable<string>? qualifiers = null)` - Add an allow rule
+- `Forbid(string action, string subject, IEnumerable<string>? qualifiers = null)` - Add a forbid rule
+- `Alias(string alias, IEnumerable<string> values, PrivilegeMatch type)` - Create an alias
+- `Build()` - Create the PrivilegeContext
+
+### PrivilegeContext
+
+- `Allowed(string? action, string? subject, string? qualifier = null)` - Check if action is allowed
+- `Forbidden(string? action, string? subject, string? qualifier = null)` - Check if action is forbidden
+- `MatchRules(string? action, string? subject, string? qualifier = null)` - Get matching rules
+
+### Extension Methods
+
+- `Allow(IEnumerable<string> actions, string subject, ...)` - Allow multiple actions on single subject
+- `Allow(string action, IEnumerable<string> subjects, ...)` - Allow single action on multiple subjects
+- `Allow(IEnumerable<string> actions, IEnumerable<string> subjects, ...)` - Allow multiple actions on multiple subjects
+- Similar `Forbid` overloads for forbid rules
+
 ## Blazor Integration
 
 The `Privileged.Components` package provides components for conditional rendering based on permissions.
@@ -326,16 +367,49 @@ Use the `PrivilegedView` component to conditionally render content:
 }
 ```
 
-### Cascading Parameters
+### PrivilegeLink Component
 
-The PrivilegedView component requires a `PrivilegeContext` cascading parameter:
+The `PrivilegeLink` component extends the standard `NavLink` component to provide privilege-aware navigation. It only renders the link when the user has the required permissions, making it perfect for building navigation menus and UI elements that should only be visible to authorized users.
+
+The link components require a `PrivilegeContext` cascading parameter.
 
 ```razor
-<CascadingValue Value="@privilegeContext">
-    <PrivilegedView Action="read" Subject="Post">
-        <p>Protected content here</p>
-    </PrivilegedView>
-</CascadingValue>
+@* Basic navigation link that only shows if user can read posts *@
+<PrivilegeLink Subject="Post" Action="read" href="/posts">
+    View Posts
+</PrivilegeLink>
+
+@* Link with custom action *@
+<PrivilegeLink Subject="Post" Action="edit" href="/posts/edit">
+    Edit Posts
+</PrivilegeLink>
+
+@* Link with field-level permissions *@
+<PrivilegeLink Subject="Post" Action="update" Qualifier="title" href="/posts/edit-title">
+    Edit Post Titles
+</PrivilegeLink>
+
+@* Navigation menu example *@
+<nav class="navbar">
+    <PrivilegeLink Subject="Post" href="/posts" class="nav-link">
+        Posts
+    </PrivilegeLink>
+    <PrivilegeLink Subject="User" Action="manage" href="/users" class="nav-link">
+        Users
+    </PrivilegeLink>
+    <PrivilegeLink Subject="Settings" Action="edit" href="/settings" class="nav-link">
+        Settings
+    </PrivilegeLink>
+</nav>
+
+@* Using with CSS classes and additional attributes *@
+<PrivilegeLink Subject="Post" 
+               Action="delete" 
+               href="/posts/delete" 
+               class="btn btn-danger"
+               @onclick="ConfirmDelete">
+    Delete Post
+</PrivilegeLink>
 ```
 
 ### Privilege-Aware Input Components
@@ -381,47 +455,6 @@ These components automatically:
 
 - Enable/disable based on update permissions
 - Show/hide based on read permissions
-
-## Rule Evaluation
-
-### Rule Precedence
-
-Rules are evaluated in the order they are defined, with more specific rules taking precedence:
-
-1. **Forbid rules** always take precedence over allow rules when both match
-2. Rules are matched based on exact string comparison (case-insensitive by default)
-3. Wildcard rules (`PrivilegeActions.All`, `PrivilegeSubjects.All`) match any value
-4. Alias expansion happens during rule matching
-
-### String Comparison
-
-By default, rule matching uses `StringComparer.InvariantCultureIgnoreCase`. You can customize this:
-
-```csharp
-var context = new PrivilegeContext(rules, aliases, StringComparer.Ordinal);
-```
-
-## API Reference
-
-### PrivilegeBuilder
-
-- `Allow(string action, string subject, IEnumerable<string>? qualifiers = null)` - Add an allow rule
-- `Forbid(string action, string subject, IEnumerable<string>? qualifiers = null)` - Add a forbid rule
-- `Alias(string alias, IEnumerable<string> values, PrivilegeMatch type)` - Create an alias
-- `Build()` - Create the PrivilegeContext
-
-### PrivilegeContext
-
-- `Allowed(string? action, string? subject, string? qualifier = null)` - Check if action is allowed
-- `Forbidden(string? action, string? subject, string? qualifier = null)` - Check if action is forbidden
-- `MatchRules(string? action, string? subject, string? qualifier = null)` - Get matching rules
-
-### Extension Methods
-
-- `Allow(IEnumerable<string> actions, string subject, ...)` - Allow multiple actions on single subject
-- `Allow(string action, IEnumerable<string> subjects, ...)` - Allow single action on multiple subjects
-- `Allow(IEnumerable<string> actions, IEnumerable<string> subjects, ...)` - Allow multiple actions on multiple subjects
-- Similar `Forbid` overloads for forbid rules
 
 ## License
 

@@ -5,6 +5,7 @@ using Privileged.Components;
 using Sample.Application.Client.Services;
 
 namespace Sample.Application.Client;
+
 internal class Program
 {
     static async Task Main(string[] args)

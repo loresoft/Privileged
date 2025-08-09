@@ -70,7 +70,7 @@ public class PrivilegeContextTests
             .Allow("read", "User")
             .Build();
 
-        context.Allowed("read", "Post").Should().BeTrue();
+        context.Allowed("read", "Post").Should().BeFalse();
         context.Allowed("read", "Post", "id").Should().BeTrue();
         context.Allowed("read", "Post", "title").Should().BeTrue();
         context.Allowed("read", "Post", "ssn").Should().BeFalse();
@@ -114,7 +114,7 @@ public class PrivilegeContextTests
             .Allow("read", "Post", ["fields"])
             .Build();
 
-        context.Allowed("read", "Post").Should().BeTrue();
+        context.Allowed("read", "Post").Should().BeFalse();
         context.Allowed("read", "Post", "title").Should().BeTrue();
         context.Allowed("read", "Post", "id").Should().BeTrue();
 
