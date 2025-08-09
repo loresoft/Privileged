@@ -173,6 +173,8 @@ First, add the privilege context as a cascading value in your app:
 
 ```csharp
 // Program.cs or similar
+       
+// Create privilege rules
 var privilegeContext = new PrivilegeBuilder()
     .Allow("read", "Post")
     .Allow("edit", "Post", ["title", "content"])
@@ -180,7 +182,33 @@ var privilegeContext = new PrivilegeBuilder()
     .Build();
 
 // Make available as cascading parameter
-builder.Services.AddScoped<PrivilegeContext>(_ => privilegeContext);
+builder.Services.AddCascadingValue(_ => privilegeContext);
+```
+
+### PrivilegeContextView Component
+
+For scenarios where you need to load the privilege context asynchronously, use the `PrivilegeContextView` component:
+
+```razor
+<PrivilegeContextView>
+    <Loading>
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading permissions...</span>
+        </div>
+    </Loading>
+    <Loaded>
+        <PrivilegedView Action="read" Subject="Post">
+            <p>Content loaded with permissions!</p>
+        </PrivilegedView>
+    </Loaded>
+</PrivilegeContextView>
+```
+
+This component requires an `IPrivilegeContextProvider` service to be registered:
+
+```csharp
+// In Program.cs
+builder.Services.AddScoped<IPrivilegeContextProvider, YourPrivilegeContextProvider>();
 ```
 
 ### PrivilegedView Component
@@ -265,32 +293,6 @@ These components automatically:
 
 - Enable/disable based on update permissions
 - Show/hide based on read permissions
-
-### PrivilegeContextView Component
-
-For scenarios where you need to load the privilege context asynchronously, use the `PrivilegeContextView` component:
-
-```razor
-<PrivilegeContextView>
-    <Loading>
-        <div class="spinner-border" role="status">
-            <span class="visually-hidden">Loading permissions...</span>
-        </div>
-    </Loading>
-    <Loaded>
-        <PrivilegedView Action="read" Subject="Post">
-            <p>Content loaded with permissions!</p>
-        </PrivilegedView>
-    </Loaded>
-</PrivilegeContextView>
-```
-
-This component requires an `IPrivilegeContextProvider` service to be registered:
-
-```csharp
-// In Program.cs
-builder.Services.AddScoped<IPrivilegeContextProvider, YourPrivilegeContextProvider>();
-```
 
 ## Rule Evaluation
 
