@@ -1,0 +1,42 @@
+@host = https://localhost:7010
+
+### Root welcome (public)
+GET {{host}}/
+Accept: application/json
+
+### Login endpoint to get JWT
+
+# @name login
+POST {{host}}/login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "username": "testuser",
+  "password": "password"
+}
+
+
+### Get posts (requires read Post) - should be 200
+GET {{host}}/posts
+Accept: application/json
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Update post title (requires update Post with qualifier title) - should be 200
+PUT {{host}}/posts/1/title
+Content-Type: application/json
+Accept: application/json
+Authorization: Bearer {{login.response.body.$.token}}
+
+{
+  "title": "Updated Title via .http"
+}
+
+### Delete post (requires delete Post) - should be 403 Forbidden in sample
+DELETE {{host}}/posts/1
+Accept: application/json
+Authorization: Bearer {{login.response.body.$.token}}
+
+### Get posts, no authorization - should be 403 Forbidden
+GET {{host}}/posts
+Accept: application/json

@@ -90,8 +90,7 @@ public class PrivilegeBuilder
     /// </param>
     public PrivilegeBuilder(IEnumerable<PrivilegeRule> rules, IEnumerable<PrivilegeAlias>? aliases = null, StringComparer? stringComparer = null)
     {
-        if (rules == null)
-            throw new ArgumentNullException(nameof(rules));
+        ArgumentNullException.ThrowIfNull(rules);
 
         _rules = rules.ToList();
         _aliases = aliases?.ToList() ?? [];
@@ -111,8 +110,7 @@ public class PrivilegeBuilder
     /// </param>
     public PrivilegeBuilder(PrivilegeModel model, StringComparer? stringComparer = null)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
+        ArgumentNullException.ThrowIfNull(model);
 
         _rules = model.Rules.ToList();
         _aliases = model.Aliases.ToList();
@@ -140,7 +138,9 @@ public class PrivilegeBuilder
     /// </remarks>
     public PrivilegeBuilder Comparer(StringComparer comparer)
     {
-        _stringComparer = comparer ?? throw new ArgumentNullException(nameof(comparer));
+        ArgumentNullException.ThrowIfNull(comparer);
+
+        _stringComparer = comparer;
         return this;
     }
 
@@ -188,11 +188,8 @@ public class PrivilegeBuilder
     /// <seealso cref="PrivilegeBuilderExtensions.Allow(PrivilegeBuilder, IEnumerable{string}, string, IEnumerable{string}?)"/>
     public PrivilegeBuilder Allow(string action, string subject, IEnumerable<string>? qualifiers = null)
     {
-        if (string.IsNullOrWhiteSpace(action))
-            throw new ArgumentException("Action cannot be null or whitespace.", nameof(action));
-
-        if (string.IsNullOrWhiteSpace(subject))
-            throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
+        ArgumentException.ThrowIfNullOrWhiteSpace(subject);
 
         var qualifierSet = qualifiers?.ToList();
         var rule = new PrivilegeRule
@@ -201,6 +198,7 @@ public class PrivilegeBuilder
             Subject = subject,
             Qualifiers = qualifierSet
         };
+
         _rules.Add(rule);
 
         return this;
@@ -251,11 +249,8 @@ public class PrivilegeBuilder
     /// <seealso cref="PrivilegeBuilderExtensions.Forbid(PrivilegeBuilder, IEnumerable{string}, string, IEnumerable{string}?)"/>
     public PrivilegeBuilder Forbid(string action, string subject, IEnumerable<string>? qualifiers = null)
     {
-        if (string.IsNullOrWhiteSpace(action))
-            throw new ArgumentException("Action cannot be null or whitespace.", nameof(action));
-
-        if (string.IsNullOrWhiteSpace(subject))
-            throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
+        ArgumentException.ThrowIfNullOrWhiteSpace(subject);
 
         var qualifierSet = qualifiers?.ToList();
         var rule = new PrivilegeRule
@@ -265,6 +260,7 @@ public class PrivilegeBuilder
             Qualifiers = qualifierSet,
             Denied = true
         };
+
         _rules.Add(rule);
 
         return this;
@@ -320,11 +316,8 @@ public class PrivilegeBuilder
     /// <seealso cref="PrivilegeAlias"/>
     public PrivilegeBuilder Alias(string alias, IEnumerable<string> values, PrivilegeMatch type)
     {
-        if (string.IsNullOrWhiteSpace(alias))
-            throw new ArgumentException("Alias cannot be null or whitespace.", nameof(alias));
-
-        if (values == null)
-            throw new ArgumentNullException(nameof(values));
+        ArgumentException.ThrowIfNullOrWhiteSpace(alias, nameof(alias));
+        ArgumentNullException.ThrowIfNull(values);
 
         var aliasValues = values.ToList();
         var privilegeAlias = new PrivilegeAlias
@@ -346,8 +339,7 @@ public class PrivilegeBuilder
     /// <returns>The current <see cref="PrivilegeBuilder" /> instance for method chaining.</returns>
     public PrivilegeBuilder Merge(PrivilegeModel model)
     {
-        if (model == null)
-            throw new ArgumentNullException(nameof(model));
+        ArgumentNullException.ThrowIfNull(model);
 
         // Merge rules, removing duplicates
         var existingRules = new HashSet<PrivilegeRule>(_rules);

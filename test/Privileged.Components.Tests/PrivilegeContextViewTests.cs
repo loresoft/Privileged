@@ -1,7 +1,8 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,6 +10,19 @@ namespace Privileged.Components.Tests;
 
 public class PrivilegeContextViewTests : TestContext
 {
+    public PrivilegeContextViewTests()
+    {
+        // Provide a mock AuthenticationStateProvider with a default authenticated user
+        var mockUser = new ClaimsPrincipal(new ClaimsIdentity(new[]
+        {
+            new Claim(ClaimTypes.Name, "TestUser"),
+            new Claim(ClaimTypes.Role, "Administrator")
+        }, "TestAuthentication"));
+
+        var mockAuthStateProvider = new MockAuthenticationStateProvider(mockUser);
+        Services.AddSingleton<AuthenticationStateProvider>(mockAuthStateProvider);
+    }
+
     [Fact]
     public void Displays_Loading_Content_When_Context_Is_Null()
     {
@@ -186,7 +200,7 @@ internal class MockPrivilegeContextProvider : IPrivilegeContextProvider
         _context = context;
     }
 
-    public ValueTask<PrivilegeContext> GetContextAsync()
+    public ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
     {
         return _context != null
             ? ValueTask.FromResult(_context)
@@ -205,7 +219,7 @@ internal class AsyncMockPrivilegeContextProvider : IPrivilegeContextProvider
         _delay = delay;
     }
 
-    public async ValueTask<PrivilegeContext> GetContextAsync()
+    public async ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
     {
         await Task.Delay(_delay);
         return _context;
@@ -214,7 +228,7 @@ internal class AsyncMockPrivilegeContextProvider : IPrivilegeContextProvider
 
 internal class TestPrivilegeContextProvider : IPrivilegeContextProvider
 {
-    public ValueTask<PrivilegeContext> GetContextAsync()
+    public ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
     {
         var context = new PrivilegeBuilder()
             .Allow("read", "TestEntity")
@@ -228,7 +242,7 @@ internal class TestPrivilegeContextProvider : IPrivilegeContextProvider
 
 internal class NullReturningProvider : IPrivilegeContextProvider
 {
-    public ValueTask<PrivilegeContext> GetContextAsync()
+    public ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
     {
         return ValueTask.FromResult<PrivilegeContext>(null!);
     }
@@ -242,5 +256,20 @@ internal class TestPrivilegeConsumer : ComponentBase
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
         builder.AddContent(0, $"Received context: {(ReceivedContext != null ? "Yes" : "No")}");
+    }
+}
+
+internal class MockAuthenticationStateProvider : AuthenticationStateProvider
+{
+    private readonly ClaimsPrincipal _user;
+
+    public MockAuthenticationStateProvider(ClaimsPrincipal user)
+    {
+        _user = user;
+    }
+
+    public override Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        return Task.FromResult(new AuthenticationState(_user));
     }
 }

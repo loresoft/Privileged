@@ -7,12 +7,15 @@
   <Folder Name="/Samples/">
     <Project Path="samples/Sample.Application/Sample.Application.Client/Sample.Application.Client.csproj" Id="4fcd084e-f14e-4872-bb38-3fb46eb5a228" />
     <Project Path="samples/Sample.Application/Sample.Application/Sample.Application.csproj" Id="228d1441-d94e-4ff8-aee0-20c416934de6" />
+    <Project Path="samples/Sample.MinimalApi/Sample.MinimalApi.csproj" Id="1968c637-64af-4612-afad-41e13372dc65" />
   </Folder>
   <Folder Name="/Tests/">
+    <Project Path="test/Privileged.Authorization.Tests/Privileged.Authorization.Tests.csproj" Id="12bc1ea2-db7c-47d7-8ff4-8bab4e660f55" />
     <Project Path="test/Privileged.Benchmarks/Privileged.Benchmarks.csproj" Id="f6d8913f-9793-45c1-92c8-8f897e1e49a5" />
     <Project Path="test/Privileged.Components.Tests/Privileged.Components.Tests.csproj" />
     <Project Path="test/Privileged.Tests/Privileged.Tests.csproj" />
   </Folder>
+  <Project Path="src/Privileged.Authorization/Privileged.Authorization.csproj" Id="9e8613cb-6037-4223-93e7-b413e1272671" />
   <Project Path="src/Privileged.Components/Privileged.Components.csproj" />
   <Project Path="src/Privileged/Privileged.csproj" />
 </Solution>

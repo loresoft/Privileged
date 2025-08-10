@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
+using Privileged;
 using Privileged.Components;
 
 using Sample.Application.Client.Services;

@@ -9,10 +9,11 @@ API services, and database queries.
 [![License](https://img.shields.io/github/license/loresoft/Privileged.svg)](https://github.com/loresoft/Privileged/blob/main/LICENSE)
 [![Coverage Status](https://coveralls.io/repos/github/loresoft/Privileged/badge.svg?branch=main)](https://coveralls.io/github/loresoft/Privileged?branch=main)
 
-| Package                                                                        | Version                                                                                                                     | Description                                           |
-| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| [Privileged](https://www.nuget.org/packages/Privileged/)                       | [![NuGet](https://img.shields.io/nuget/v/Privileged.svg)](https://www.nuget.org/packages/Privileged/)                       | Core authorization library for rule-based permissions |
-| [Privileged.Components](https://www.nuget.org/packages/Privileged.Components/) | [![NuGet](https://img.shields.io/nuget/v/Privileged.Components.svg)](https://www.nuget.org/packages/Privileged.Components/) | Blazor components for privilege-aware UI elements     |
+| Package                                                                              | Version                                                                                                                           | Description                                                          |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| [Privileged](https://www.nuget.org/packages/Privileged/)                             | [![NuGet](https://img.shields.io/nuget/v/Privileged.svg)](https://www.nuget.org/packages/Privileged/)                             | Core authorization library for rule-based permissions                |
+| [Privileged.Authorization](https://www.nuget.org/packages/Privileged.Authorization/) | [![NuGet](https://img.shields.io/nuget/v/Privileged.Authorization.svg)](https://www.nuget.org/packages/Privileged.Authorization/) | ASP.NET Core authorization integration with attribute-based policies |
+| [Privileged.Components](https://www.nuget.org/packages/Privileged.Components/)       | [![NuGet](https://img.shields.io/nuget/v/Privileged.Components.svg)](https://www.nuget.org/packages/Privileged.Components/)       | Blazor components for privilege-aware UI elements                    |
 
 ## Installation
 
@@ -20,6 +21,12 @@ Install the core package via NuGet:
 
 ```bash
 dotnet add package Privileged
+```
+
+For ASP.NET Core applications with attribute-based authorization, also install the authorization package:
+
+```bash
+dotnet add package Privileged.Authorization
 ```
 
 For Blazor applications, also install the components package:
@@ -36,6 +43,7 @@ dotnet add package Privileged.Components
 - **Rule-based** Support for both allow and forbid rules with rule precedence
 - **Aliases** Create reusable aliases for actions, subjects, and qualifiers
 - **Qualifiers** Fine-grained control with field-level permissions
+- **ASP.NET Core Integration** Seamless integration with ASP.NET Core authorization using attribute-based policies
 - **Blazor Integration** Ready-to-use components for conditional rendering and privilege-aware form inputs
 - **Performance Optimized** Efficient rule evaluation and matching algorithms
 
@@ -204,17 +212,348 @@ var context = new PrivilegeContext(rules, aliases, StringComparer.Ordinal);
 - `Allow(IEnumerable<string> actions, IEnumerable<string> subjects, ...)` - Allow multiple actions on multiple subjects
 - Similar `Forbid` overloads for forbid rules
 
+## ASP.NET Core Authorization Integration
+
+The `Privileged.Authorization` package provides seamless integration with ASP.NET Core's authorization system through attribute-based policies.
+
+### Setup
+
+First, configure the authorization services in your `Program.cs`:
+
+```csharp
+// Program.cs
+using Privileged.Authorization;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add privilege-based authorization
+builder.Services.AddPrivilegeAuthorization<YourPrivilegeContextProvider>();
+
+// Or add services separately
+builder.Services.AddPrivilegeAuthorization();
+builder.Services.AddScoped<IPrivilegeContextProvider, YourPrivilegeContextProvider>();
+
+var app = builder.Build();
+```
+
+### Using the PrivilegeAttribute
+
+Use the `[Privilege]` attribute on controllers and actions to declaratively specify authorization requirements:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class PostsController : ControllerBase
+{
+    [HttpGet]
+    [Privilege("read", "Post")]
+    public IActionResult GetPosts()
+    {
+        // Only users with "read" privilege on "Post" can access this
+        return Ok();
+    }
+
+    [HttpPost]
+    [Privilege("create", "Post")]
+    public IActionResult CreatePost([FromBody] CreatePostRequest request)
+    {
+        // Only users with "create" privilege on "Post" can access this
+        return Ok();
+    }
+
+    [HttpPut("{id}")]
+    [Privilege("update", "Post")]
+    public IActionResult UpdatePost(int id, [FromBody] UpdatePostRequest request)
+    {
+        // Only users with "update" privilege on "Post" can access this
+        return Ok();
+    }
+
+    [HttpDelete("{id}")]
+    [Privilege("delete", "Post")]
+    public IActionResult DeletePost(int id)
+    {
+        // Only users with "delete" privilege on "Post" can access this
+        return NoContent();
+    }
+
+    [HttpPut("{id}/title")]
+    [Privilege("update", "Post", "title")]
+    public IActionResult UpdatePostTitle(int id, [FromBody] string title)
+    {
+        // Only users with "update" privilege on "Post" for "title" field can access this
+        return Ok();
+    }
+}
+```
+
+### Manual Authorization Checks
+
+You can also perform manual authorization checks in your controllers:
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class PostsController : ControllerBase
+{
+    private readonly IPrivilegeContextProvider _contextProvider;
+
+    public PostsController(IPrivilegeContextProvider contextProvider)
+    {
+        _contextProvider = contextProvider;
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetPost(int id)
+    {
+        var context = await _contextProvider.GetContextAsync();
+
+        if (!context.Allowed("read", "Post"))
+        {
+            return Forbid();
+        }
+
+        // Additional business logic...
+        return Ok();
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdatePost(int id, [FromBody] UpdatePostRequest request)
+    {
+        var context = await _contextProvider.GetContextAsync();
+
+        // Check different permissions based on what's being updated
+        if (!string.IsNullOrEmpty(request.Title) && !context.Allowed("update", "Post", "title"))
+        {
+            return Forbid("Cannot update post title");
+        }
+
+        if (!string.IsNullOrEmpty(request.Content) && !context.Allowed("update", "Post", "content"))
+        {
+            return Forbid("Cannot update post content");
+        }
+
+        // Perform update...
+        return Ok();
+    }
+}
+```
+
+#### Minimal API Example
+
+You can also use privilege-based authorization with ASP.NET Core Minimal APIs. The `[Privilege]` attribute works on route handler delegates, and the dynamic policies will be generated in exactly the same way.
+
+```csharp
+using Microsoft.AspNetCore.Authorization;
+using Privileged.Authorization;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add authentication here (JWT/Cookies/etc.)
+builder.Services.AddAuthentication(...);
+builder.Services.AddAuthorization();
+
+// Register privilege services + your provider
+builder.Services.AddPrivilegeAuthorization<DatabasePrivilegeContextProvider>();
+
+
+var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Simple collection endpoint requiring read privilege on Post
+app.MapGet("/api/posts", [Privilege("read", "Post")] () => Results.Ok(new[] { new { Id = 1, Title = "Hello" } }));
+
+// Create endpoint requiring create privilege
+app.MapPost("/api/posts", [Privilege("create", "Post")] (CreatePostRequest req) =>
+{
+    // Business logic...
+    return Results.Created($"/api/posts/{123}", req);
+});
+
+// Update with qualifier (field-level) example
+app.MapPut("/api/posts/{id}/title", [Privilege("update", "Post", "title")] (int id, string title) =>
+{
+    // Only users with update privilege on Post:title reach here
+    return Results.Ok();
+});
+
+// Manual check example inside a handler
+app.MapPut("/api/posts/{id}", async (int id, UpdatePostRequest req, IPrivilegeContextProvider provider) =>
+{
+    var context = await provider.GetContextAsync();
+
+    if (req.Title is not null && !context.Allowed("update", "Post", "title"))
+        return Results.Forbid();
+
+    if (req.Content is not null && !context.Allowed("update", "Post", "content"))
+        return Results.Forbid();
+
+    return Results.Ok();
+});
+
+app.Run();
+
+// Example request models
+public record CreatePostRequest(string Title, string Content);
+public record UpdatePostRequest(string? Title, string? Content);
+```
+
+Key points:
+
+- Apply `[Privilege]` directly to route handler delegates.
+- Dynamic policy names follow the `Privilege:action:subject[:qualifier]` format automatically.
+- For ad-hoc logic or multiple field checks, inject `IPrivilegeContextProvider` and perform manual `Allowed` calls.
+- Combine with your existing authentication middleware (JWT, cookies, etc.).
+
+### IPrivilegeContextProvider Implementation
+
+The `IPrivilegeContextProvider` interface allows you to load privilege contexts asynchronously, which is useful for scenarios where permissions are loaded from external sources like APIs, databases, or authentication systems. This interface is used by both ASP.NET Core and Blazor applications.
+
+#### ASP.NET Core: Database-Based Provider
+
+For ASP.NET Core applications that load permissions from a database or external service.
+
+```csharp
+public class DatabasePrivilegeContextProvider : IPrivilegeContextProvider
+{
+    private readonly IUserPermissionService _permissionService;
+    private readonly HybridCache _cache;
+    private readonly ILogger<DatabasePrivilegeContextProvider> _logger;
+
+    public DatabasePrivilegeContextProvider(
+        IUserPermissionService permissionService,
+        HybridCache cache,
+        ILogger<DatabasePrivilegeContextProvider> logger)
+    {
+        _permissionService = permissionService;
+        _cache = cache;
+        _logger = logger;
+    }
+
+    public async ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
+    {
+        var user = claimsPrincipal;
+
+        // Return empty context for unauthenticated users
+        if (user?.Identity?.IsAuthenticated != true)
+            return PrivilegeContext.Empty;
+
+        try
+        {
+            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                _logger.LogWarning("User ID not found in claims");
+                return PrivilegeContext.Empty;
+            }
+
+            string cacheKey = $"privileged:permissions:{userId}";
+
+            // Cache the privilege model to avoid repeated DB/service calls per request.
+            PrivilegeModel privilegeModel = await _cache.GetOrCreateAsync(
+                cacheKey,
+                async ct => await _permissionService.GetUserPermissionsAsync(userId),
+                options => options.SetExpiration(TimeSpan.FromMinutes(5))
+            );
+
+            return new PrivilegeContext(privilegeModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load privileges for current user");
+            return PrivilegeContext.Empty;
+        }
+    }
+}
+```
+
+#### Blazor: API-Based Provider
+
+For Blazor applications that load permissions from an API:
+
+```csharp
+public class HttpPrivilegeContextProvider : IPrivilegeContextProvider
+{
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<HttpPrivilegeContextProvider> _logger;
+
+    public HttpPrivilegeContextProvider(
+        HttpClient httpClient,
+        ILogger<HttpPrivilegeContextProvider> logger)
+    {
+        _httpClient = httpClient;
+        _logger = logger;
+    }
+
+    public async ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
+    {
+        try
+        {
+            // Load privilege model from API
+            var privilegeModel = await _httpClient.GetFromJsonAsync<PrivilegeModel>("/api/user/privileges");
+            return new PrivilegeContext(privilegeModel);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to load user privileges");
+
+            // Return minimal context with basic read permissions as fallback
+            return new PrivilegeBuilder()
+                .Allow("read", "Public")
+                .Build();
+        }
+    }
+}
+```
+
+#### Static Provider
+
+For simpler scenarios with static permissions:
+
+```csharp
+public class StaticPrivilegeContextProvider : IPrivilegeContextProvider
+{
+    public ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
+    {
+        var context = new PrivilegeBuilder()
+            .Allow("read", "Post")
+            .Allow("write", "Post", new[] {"title", "content"})
+            .Allow("delete", "Post")
+            .Forbid("publish", "Post") // Override specific action
+            .Build();
+
+        return ValueTask.FromResult(context);
+    }
+}
+```
+
+#### Registration
+
+Register your chosen provider in `Program.cs`:
+
+```csharp
+// For ASP.NET Core
+builder.Services.AddScoped<IPrivilegeContextProvider, DatabasePrivilegeContextProvider>();
+
+// For Blazor
+builder.Services.AddScoped<IPrivilegeContextProvider, HttpPrivilegeContextProvider>();
+// or
+builder.Services.AddScoped<IPrivilegeContextProvider, StaticPrivilegeContextProvider>();
+```
+
 ## Blazor Integration
 
 The `Privileged.Components` package provides components for conditional rendering based on permissions.
 
-### Setup
+### Blazor Setup
 
 First, add the privilege context as a cascading value in your app:
 
 ```csharp
 // Program.cs or similar
-       
+
 // Create privilege rules
 var privilegeContext = new PrivilegeBuilder()
     .Allow("read", "Post")
@@ -274,69 +613,6 @@ The most common pattern is to wrap your entire layout with `PrivilegeContextView
 ```
 
 With this approach, all pages will automatically have access to the privilege context, and users will see a loading state until permissions are loaded. Your navigation menu can also use privilege checking:
-
-### IPrivilegeContextProvider Implementation
-
-The `IPrivilegeContextProvider` interface allows you to load privilege contexts asynchronously, which is useful for scenarios where permissions are loaded from external sources like APIs, databases, or authentication systems.
-
-Here's how to implement a custom provider:
-
-```csharp
-public class RemotePrivilegeContextProvider : IPrivilegeContextProvider
-{
-    private readonly HttpClient _httpClient;
-    private readonly ILogger<RemotePrivilegeContextProvider> _logger;
-
-    public RemotePrivilegeContextProvider(
-        HttpClient httpClient, 
-        ILogger<RemotePrivilegeContextProvider> logger)
-    {
-        _httpClient = httpClient;
-        _logger = logger;
-    }
-
-    public async ValueTask<PrivilegeContext> GetContextAsync()
-    {
-        try
-        {
-            // Load privilege model from API
-            var privilegeModel = await _httpClient.GetFromJsonAsync<PrivilegeModel>("/api/user/privileges");
-            return new PrivilegeContext(privilegeModel)
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to load user privileges");
-            
-            // Return minimal context with basic read permissions as fallback
-            return new PrivilegeBuilder()
-                .Allow("read", "Public")
-                .Build();
-        }
-    }
-}
-
-// Register the provider in Program.cs
-builder.Services.AddScoped<IPrivilegeContextProvider, RemotePrivilegeContextProvider>();
-```
-
-For simpler scenarios, you can create a static provider:
-
-```csharp
-public class StaticPrivilegeContextProvider : IPrivilegeContextProvider
-{
-    public ValueTask<PrivilegeContext> GetContextAsync()
-    {
-        var context = new PrivilegeBuilder()
-            .Allow("read", "Post")
-            .Allow("write", "Post", ["title", "content"])
-            .Allow("delete", "Post")
-            .Forbid("publish", "Post") // Override specific action
-            .Build();
-        
-        return ValueTask.FromResult(context);
-    }
-}
-```
 
 ### PrivilegedView Component
 
@@ -403,9 +679,9 @@ The link components require a `PrivilegeContext` cascading parameter.
 </nav>
 
 @* Using with CSS classes and additional attributes *@
-<PrivilegeLink Subject="Post" 
-               Action="delete" 
-               href="/posts/delete" 
+<PrivilegeLink Subject="Post"
+               Action="delete"
+               href="/posts/delete"
                class="btn btn-danger"
                @onclick="ConfirmDelete">
     Delete Post

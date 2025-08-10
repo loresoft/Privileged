@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Privileged.Benchmarks.Optimizations;
 
-public class PrivilegeContextOriginal : IPrivilegeContext
+public class PrivilegeContextOriginal
 {
     public PrivilegeContextOriginal(
         PrivilegeModel model,

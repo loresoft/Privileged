@@ -1,3 +1,6 @@
+using System.Collections.Concurrent;
+using System.Reflection;
+
 namespace Privileged;
 
 /// <summary>
@@ -22,37 +25,18 @@ namespace Privileged;
 /// and more specific rules override general wildcard rules.
 /// </para>
 /// </remarks>
-/// <example>
-/// The following example demonstrates creating and using a <see cref="PrivilegeContext"/>:
-/// <code>
-/// var rules = new List&lt;PrivilegeRule&gt;
-/// {
-///     new PrivilegeRule { Action = "read", Subject = "Post" },
-///     new PrivilegeRule { Action = "write", Subject = "Post", Qualifiers = new List&lt;string&gt; { "title", "content" } },
-///     new PrivilegeRule { Action = "delete", Subject = "Post", Denied = true }
-/// };
-///
-/// var aliases = new List&lt;PrivilegeAlias&gt;
-/// {
-///     new PrivilegeAlias { Alias = "Manage", Values = new List&lt;string&gt; { "create", "update", "delete" }, Type = PrivilegeMatch.Action }
-/// };
-///
-/// var model = new PrivilegeModel { Rules = rules, Aliases = aliases };
-/// var context = new PrivilegeContext(model);
-///
-/// bool canRead = context.Allowed("read", "Post");             // true
-/// bool canWrite = context.Allowed("write", "Post", "title");  // true
-/// bool canDelete = context.Forbidden("delete", "Post");       // true
-/// </code>
-/// </example>
-/// <seealso cref="IPrivilegeContext" />
 /// <seealso cref="PrivilegeModel" />
 /// <seealso cref="PrivilegeRule" />
 /// <seealso cref="PrivilegeAlias" />
-public class PrivilegeContext : IPrivilegeContext
+public class PrivilegeContext
 {
-    private readonly Dictionary<int, bool> _allowedCache;
-    private readonly Dictionary<(string Alias, PrivilegeMatch Type), HashSet<string>> _aliasCache;
+    private readonly ConcurrentDictionary<string, bool> _allowedCache;
+    private readonly ConcurrentDictionary<(string Alias, PrivilegeMatch Type), HashSet<string>> _aliasCache;
+
+    /// <summary>
+    /// Represents an empty privilege context with no rules or aliases.
+    /// </summary>
+    public static readonly PrivilegeContext Empty = new([], []);
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PrivilegeContext"/> class using a privilege model.
@@ -63,23 +47,16 @@ public class PrivilegeContext : IPrivilegeContext
         PrivilegeModel model,
         StringComparer? stringComparer = null)
     {
-        if (model is null)
-            throw new ArgumentNullException(nameof(model));
+        ArgumentNullException.ThrowIfNull(model);
 
         Rules = model.Rules ?? [];
         Aliases = model.Aliases ?? [];
         StringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
 
-        _allowedCache = [];
-        _aliasCache = [];
+        _allowedCache = new ConcurrentDictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+        _aliasCache = new ConcurrentDictionary<(string Alias, PrivilegeMatch Type), HashSet<string>>();
 
-        // compute alias HashSets for faster lookups
-        foreach (var alias in Aliases)
-        {
-            var key = (alias.Alias, alias.Type);
-            if (!_aliasCache.ContainsKey(key))
-                _aliasCache[key] = new HashSet<string>(alias.Values, StringComparer);
-        }
+        Initialize();
     }
 
     /// <summary>
@@ -94,26 +71,32 @@ public class PrivilegeContext : IPrivilegeContext
         IReadOnlyList<PrivilegeAlias>? aliases = null,
         StringComparer? stringComparer = null)
     {
-        Rules = rules ?? throw new ArgumentNullException(nameof(rules));
+        ArgumentNullException.ThrowIfNull(rules);
+
+        Rules = rules;
         Aliases = aliases ?? [];
         StringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
 
         _allowedCache = [];
         _aliasCache = [];
 
-        // compute alias HashSets for faster lookups
-        foreach (var alias in Aliases)
-        {
-            var key = (alias.Alias, alias.Type);
-            if (!_aliasCache.ContainsKey(key))
-                _aliasCache[key] = new HashSet<string>(alias.Values, StringComparer);
-        }
+        Initialize();
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the collection of privilege rules defined for this context.
+    /// </summary>
+    /// <value>
+    /// A read-only collection of <see cref="PrivilegeRule"/> instances representing the authorization rules.
+    /// </value>
     public IReadOnlyList<PrivilegeRule> Rules { get; }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the collection of privilege aliases defined for this context.
+    /// </summary>
+    /// <value>
+    /// A read-only collection of <see cref="PrivilegeAlias"/> instances used for rule aliasing or mapping.
+    /// </value>
     public IReadOnlyList<PrivilegeAlias> Aliases { get; }
 
     /// <summary>
@@ -141,33 +124,24 @@ public class PrivilegeContext : IPrivilegeContext
         if (action is null || subject is null)
             return false;
 
-        // Generate cache key using local method
-        int cacheKey = CreateCacheKey(action, subject, qualifier);
-
-        // Check if result is already cached
-        if (_allowedCache.TryGetValue(cacheKey, out bool cachedResult))
-            return cachedResult;
-
-        // Perform privilege check
-        var matchedRules = MatchRules(action, subject, qualifier);
-        bool? state = null;
-
-        for (int i = 0; i < matchedRules.Count; i++)
+        var cacheKey = $"privilege:{action}:{subject}:{qualifier ?? string.Empty}";
+        return _allowedCache.GetOrAdd(cacheKey, _ =>
         {
-            PrivilegeRule matchedRule = matchedRules[i];
+            // Perform privilege check
+            var matchedRules = MatchRules(action, subject, qualifier);
+            bool? state = null;
 
-            if (matchedRule.Denied == true)
-                state = state != null && (state.Value && false);
-            else
-                state = state == null || (state.Value || true);
-        }
+            for (int i = 0; i < matchedRules.Count; i++)
+            {
+                PrivilegeRule matchedRule = matchedRules[i];
+                if (matchedRule.Denied == true)
+                    state = state != null && (state.Value && false);
+                else
+                    state = state == null || (state.Value || true);
+            }
 
-        bool result = state ?? false;
-
-        // Cache the result
-        _allowedCache[cacheKey] = result;
-
-        return result;
+            return state ?? false;
+        });
     }
 
     /// <inheritdoc />
@@ -212,6 +186,20 @@ public class PrivilegeContext : IPrivilegeContext
         return matchedRules;
     }
 
+
+    private void Initialize()
+    {
+        if (Aliases.Count == 0)
+            return;
+
+        // compute alias HashSets for faster lookups
+        foreach (var alias in Aliases)
+        {
+            var key = (alias.Alias, alias.Type);
+            if (!_aliasCache.ContainsKey(key))
+                _aliasCache[key] = new HashSet<string>(alias.Values, StringComparer);
+        }
+    }
 
     private bool RuleMatcher(PrivilegeRule rule, string action, string subject, string? qualifier = null)
     {
@@ -275,7 +263,7 @@ public class PrivilegeContext : IPrivilegeContext
 
     private bool AliasMatcher(IEnumerable<string>? names, string? value, PrivilegeMatch privilegeType)
     {
-        if (_aliasCache.Count == 0 || names is null || value is null)
+        if (_aliasCache.IsEmpty || names is null || value is null)
             return false;
 
         foreach (var name in names)
@@ -296,22 +284,4 @@ public class PrivilegeContext : IPrivilegeContext
         var key = (name, privilegeType);
         return _aliasCache.TryGetValue(key, out var valueSet) && valueSet.Contains(value);
     }
-
-    private static int CreateCacheKey(string action, string subject, string? qualifier)
-    {
-#if NET5_0_OR_GREATER
-        return HashCode.Combine(action, subject, qualifier);
-#else
-        unchecked
-        {
-            int hash = 17;
-            hash = (hash * 31) + action.GetHashCode();
-            hash = (hash * 31) + subject.GetHashCode();
-            hash = (hash * 31) + (qualifier?.GetHashCode() ?? 0);
-
-            return hash;
-        }
-#endif
-    }
-
 }

@@ -1,3 +1,5 @@
+using System.Security.Claims;
+
 using Privileged;
 using Privileged.Components;
 
@@ -7,7 +9,7 @@ public class PrivilegeContextProvider : IPrivilegeContextProvider
 {
     private PrivilegeContext? _cached;
 
-    public ValueTask<PrivilegeContext> GetContextAsync()
+    public ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
     {
         if (_cached is not null)
             return ValueTask.FromResult(_cached);

@@ -1,5 +1,6 @@
 @using Privileged.Components
 @using Microsoft.AspNetCore.Components
+@using Microsoft.AspNetCore.Components.Authorization
 
 <CascadingValue Value="PrivilegeContext">
     @if (PrivilegeContext is null)
@@ -21,13 +22,19 @@
     /// Gets or sets the provider for retrieving the privilege context.
     /// </summary>
     [Inject]
-    protected IPrivilegeContextProvider Provider { get; set; } = default!;
+    protected IPrivilegeContextProvider PrivilegeContextProvider { get; set; } = default!;
+
+    /// <summary>
+    /// Gets or sets the authentication state provider.
+    /// </summary>
+    [Inject]
+    protected AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the render fragment to display while the privilege context is loading.
     /// </summary>
     [Parameter]
-    public RenderFragment? Loading { get; set; } = builder => builder.AddContent(0, (MarkupString)"Loading ...");
+    public RenderFragment? Loading { get; set; } = builder => builder.AddMarkupContent(0, "Loading ...");
 
     /// <summary>
     /// Gets or sets the render fragment to display when the privilege context is loaded.
@@ -52,6 +59,8 @@
     /// <returns>A task that represents the asynchronous initialization operation.</returns>
     protected override async Task OnInitializedAsync()
     {
-        PrivilegeContext = await Provider.GetContextAsync();
+        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+
+        PrivilegeContext = await PrivilegeContextProvider.GetContextAsync(authenticationState.User);
     }
 }

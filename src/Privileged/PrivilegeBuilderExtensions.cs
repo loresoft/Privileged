@@ -21,14 +21,9 @@ public static class PrivilegeBuilderExtensions
     /// </exception>
     public static PrivilegeBuilder Allow(this PrivilegeBuilder builder, IEnumerable<string> actions, IEnumerable<string> subjects, IEnumerable<string>? qualifiers = null)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
-
-        if (actions == null)
-            throw new ArgumentNullException(nameof(actions));
-
-        if (subjects == null)
-            throw new ArgumentNullException(nameof(subjects));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(actions);
+        ArgumentNullException.ThrowIfNull(subjects);
 
         var subjectList = subjects.ToList();
 
@@ -56,11 +51,8 @@ public static class PrivilegeBuilderExtensions
     /// <exception cref="ArgumentException">Thrown if <paramref name="subject"/> is null or whitespace.</exception>
     public static PrivilegeBuilder Allow(this PrivilegeBuilder builder, IEnumerable<string> actions, string subject, IEnumerable<string>? qualifiers = null)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
-
-        if (actions == null)
-            throw new ArgumentNullException(nameof(actions));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(actions);
 
         if (string.IsNullOrWhiteSpace(subject))
             throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
@@ -86,11 +78,8 @@ public static class PrivilegeBuilderExtensions
     /// <exception cref="ArgumentException">Thrown if <paramref name="action"/> is null or whitespace.</exception>
     public static PrivilegeBuilder Allow(this PrivilegeBuilder builder, string action, IEnumerable<string> subjects, IEnumerable<string>? qualifiers = null)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
-
-        if (subjects == null)
-            throw new ArgumentNullException(nameof(subjects));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(subjects);
 
         if (string.IsNullOrWhiteSpace(action))
             throw new ArgumentException("Action cannot be null or whitespace.", nameof(action));
@@ -115,14 +104,9 @@ public static class PrivilegeBuilderExtensions
     /// <exception cref="ArgumentNullException">Thrown if <paramref name="builder"/>, <paramref name="actions"/>, or <paramref name="subjects"/> is null.</exception>
     public static PrivilegeBuilder Forbid(this PrivilegeBuilder builder, IEnumerable<string> actions, IEnumerable<string> subjects, IEnumerable<string>? qualifiers = null)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
-
-        if (actions == null)
-            throw new ArgumentNullException(nameof(actions));
-
-        if (subjects == null)
-            throw new ArgumentNullException(nameof(subjects));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(actions);
+        ArgumentNullException.ThrowIfNull(subjects);
 
         var subjectList = subjects.ToList();
 
@@ -150,14 +134,9 @@ public static class PrivilegeBuilderExtensions
     /// <exception cref="ArgumentException">Thrown if <paramref name="subject"/> is null or whitespace.</exception>
     public static PrivilegeBuilder Forbid(this PrivilegeBuilder builder, IEnumerable<string> actions, string subject, IEnumerable<string>? qualifiers = null)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
-
-        if (actions == null)
-            throw new ArgumentNullException(nameof(actions));
-
-        if (string.IsNullOrWhiteSpace(subject))
-            throw new ArgumentException("Subject cannot be null or whitespace.", nameof(subject));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(actions);
+        ArgumentException.ThrowIfNullOrWhiteSpace(subject);
 
         foreach (var action in actions)
         {
@@ -180,14 +159,9 @@ public static class PrivilegeBuilderExtensions
     /// <exception cref="ArgumentException">Thrown if <paramref name="action"/> is null or whitespace.</exception>
     public static PrivilegeBuilder Forbid(this PrivilegeBuilder builder, string action, IEnumerable<string> subjects, IEnumerable<string>? qualifiers = null)
     {
-        if (builder == null)
-            throw new ArgumentNullException(nameof(builder));
-
-        if (subjects == null)
-            throw new ArgumentNullException(nameof(subjects));
-
-        if (string.IsNullOrWhiteSpace(action))
-            throw new ArgumentException("Action cannot be null or whitespace.", nameof(action));
+        ArgumentNullException.ThrowIfNull(builder);
+        ArgumentNullException.ThrowIfNull(subjects);
+        ArgumentException.ThrowIfNullOrWhiteSpace(action);
 
         foreach (var subject in subjects)
         {
