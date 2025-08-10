@@ -91,9 +91,9 @@ public class Program
         // Endpoint requiring the 'update' privilege on 'Post' with qualifier 'title'
         app.MapPut(
             pattern: "/posts/{id:int}/title",
-            handler: [Privilege("update", "Post", "title")] ([FromRoute] int id, [FromBody] UpdateTitleRequest request)
+            handler: ([FromRoute] int id, [FromBody] UpdateTitleRequest request)
                 => Results.Ok(new { id, request.Title, updated = true })
-        );
+        ).RequirePrivilege("update", "Post", "title");
 
         // Endpoint requiring an ungranted privilege to show forbidden behavior
         app.MapDelete(

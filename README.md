@@ -378,12 +378,12 @@ app.MapPost("/api/posts", [Privilege("create", "Post")] (CreatePostRequest req) 
     return Results.Created($"/api/posts/{123}", req);
 });
 
-// Update with qualifier (field-level) example
-app.MapPut("/api/posts/{id}/title", [Privilege("update", "Post", "title")] (int id, string title) =>
+// Update with qualifier (field-level) example using RequirePrivilege extension
+app.MapPut("/api/posts/{id}/title", (int id, string title) =>
 {
     // Only users with update privilege on Post:title reach here
     return Results.Ok();
-});
+}).RequirePrivilege("update", "Post", "title");
 
 // Manual check example inside a handler
 app.MapPut("/api/posts/{id}", async (int id, UpdatePostRequest req, IPrivilegeContextProvider provider) =>
