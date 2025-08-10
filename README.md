@@ -629,22 +629,19 @@ Use the `PrivilegedView` component to conditionally render content:
 </PrivilegedView>
 
 @* With both allowed and forbidden content *@
-<PrivilegedView Action="delete" Subject="Post"
-               Allowed="@allowedContent"
-               Forbidden="@forbiddenContent" />
+<PrivilegedView Action="delete" Subject="Post">
+    <Allowed>
+        <button class="btn btn-danger">Delete Post</button>
+    </Allowed>
+    <Forbidden>
+        <span class="text-muted">Delete not allowed</span>
+    </Forbidden>
+</PrivilegedView>
 
 @* With field-level permissions *@
 <PrivilegedView Action="edit" Subject="Post" Field="title">
     <input type="text" placeholder="Edit title" />
 </PrivilegedView>
-
-@code {
-    private RenderFragment<PrivilegeContext> allowedContent = (context) =>
-        @<button class="btn btn-danger">Delete Post</button>;
-
-    private RenderFragment<PrivilegeContext> forbiddenContent = (context) =>
-        @<span class="text-muted">Delete not allowed</span>;
-}
 ```
 
 ### PrivilegeLink Component
