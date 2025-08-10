@@ -216,7 +216,7 @@ var context = new PrivilegeContext(rules, aliases, StringComparer.Ordinal);
 
 The `Privileged.Authorization` package provides seamless integration with ASP.NET Core's authorization system through attribute-based policies.
 
-### Setup
+### Authorization Setup
 
 First, configure the authorization services in your `Program.cs`:
 
@@ -226,12 +226,18 @@ using Privileged.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add privilege-based authorization
-builder.Services.AddPrivilegeAuthorization<YourPrivilegeContextProvider>();
+// Add authentication here (JWT/Cookies/etc.)
+builder.Services.AddAuthentication(...);
+builder.Services.AddAuthorization();
 
-// Or add services separately
+// Register privilege services + your provider
 builder.Services.AddPrivilegeAuthorization();
 builder.Services.AddScoped<IPrivilegeContextProvider, YourPrivilegeContextProvider>();
+
+var app = builder.Build();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 var app = builder.Build();
 ```
