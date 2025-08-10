@@ -604,18 +604,16 @@ The most common pattern is to wrap your entire layout with `PrivilegeContextView
 ```razor
 @* MainLayout.razor *@
 @inherits LayoutComponentBase
-
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <PrivilegeContextView>
+<PrivilegeContextView>
+    <div class="page">
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+        <main>
             @Body
-        </PrivilegeContextView>
-    </main>
-</div>
+        </main>
+    </div>
+</PrivilegeContextView>
 ```
 
 With this approach, all pages will automatically have access to the privilege context, and users will see a loading state until permissions are loaded. Your navigation menu can also use privilege checking:
