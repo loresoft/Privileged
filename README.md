@@ -733,6 +733,33 @@ These components automatically:
 - Enable/disable based on update permissions
 - Show/hide based on read permissions
 
+### PrivilegeInputText HTML Output Example
+
+Below is an example of the `PrivilegeInputText` component and its corresponding HTML output for various states based on the `PrivilegeContext` results:
+
+#### PrivilegeInputText Component
+
+```razor
+<PrivilegeInputText @bind-Value="@model.Title"
+                    Subject="Post"
+                    Field="title" />
+```
+
+#### Corresponding HTML Output
+
+```html
+<!-- When the user has 'update' permission -->
+<input type="text" id="Title" name="Title" value="Sample Title" />
+
+<!-- When the user has only 'read' permission, make input readonly -->
+<input type="text" id="Title" name="Title" value="Sample Title" readonly />
+
+<!-- When the user has neither 'read' nor 'update' permission, use password type and disable -->
+<input type="password" id="Title" name="Title" disabled />
+```
+
+This demonstrates how the `PrivilegeInputText` component dynamically adapts its output based on the user's permissions as determined by the `PrivilegeContext`.
+
 ## License
 
 This project is licensed under the MIT License.
