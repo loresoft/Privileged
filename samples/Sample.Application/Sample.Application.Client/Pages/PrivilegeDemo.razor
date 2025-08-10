@@ -44,7 +44,14 @@ else
     }
 
     <h3 class="mt-4">Conditional View Example</h3>
-    <PrivilegeView Action="update" Subject="Product" Field="Title" Allowed="CanUpdateTitle" Forbidden="CannotUpdateTitle" />
+    <PrivilegeView Action="update" Subject="Product">
+        <Allowed>
+            <p class="text-success">You can update the Product Title.</p>
+        </Allowed>
+        <Forbidden>
+            <p class="text-danger">You cannot update the Product Title.</p>
+        </Forbidden>
+    </PrivilegeView>
 
     <h3 class="mt-4">Privilege Aware Form</h3>
     <EditForm Model="Model" OnValidSubmit="OnSubmit">
@@ -105,23 +112,6 @@ else
 
     private string AllowedState(string action, string subject, string? field = null)
         => Context?.Allowed(action, subject, field) == true ? "✔" : "✘";
-
-    // Render fragments for conditional view
-    private RenderFragment<PrivilegeContext> CanUpdateTitle => ctx => builder =>
-    {
-        builder.OpenElement(0, "p");
-        builder.AddAttribute(1, "class", "text-success");
-        builder.AddContent(2, "You can update the Product Title.");
-        builder.CloseElement();
-    };
-
-    private RenderFragment<PrivilegeContext> CannotUpdateTitle => ctx => builder =>
-    {
-        builder.OpenElement(0, "p");
-        builder.AddAttribute(1, "class", "text-danger");
-        builder.AddContent(2, "You cannot update the Product Title.");
-        builder.CloseElement();
-    };
 
     public class ProductModel
     {

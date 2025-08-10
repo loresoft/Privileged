@@ -583,9 +583,9 @@ For scenarios where you need to load the privilege context asynchronously, use t
         </div>
     </Loading>
     <Loaded>
-        <PrivilegedView Action="read" Subject="Post">
+        <PrivilegeView Action="read" Subject="Post">
             <p>Content loaded with permissions!</p>
-        </PrivilegedView>
+        </PrivilegeView>
     </Loaded>
 </PrivilegeContextView>
 ```
@@ -618,30 +618,30 @@ The most common pattern is to wrap your entire layout with `PrivilegeContextView
 
 With this approach, all pages will automatically have access to the privilege context, and users will see a loading state until permissions are loaded. Your navigation menu can also use privilege checking:
 
-### PrivilegedView Component
+### PrivilegeView Component
 
-Use the `PrivilegedView` component to conditionally render content:
+Use the `PrivilegeView` component to conditionally render content:
 
 ```razor
 @* Basic usage with ChildContent *@
-<PrivilegedView Action="read" Subject="Post">
+<PrivilegeView Action="read" Subject="Post">
     <p>You can read posts!</p>
-</PrivilegedView>
+</PrivilegeView>
 
 @* With both allowed and forbidden content *@
-<PrivilegedView Action="delete" Subject="Post">
+<PrivilegeView Action="delete" Subject="Post">
     <Allowed>
         <button class="btn btn-danger">Delete Post</button>
     </Allowed>
     <Forbidden>
         <span class="text-muted">Delete not allowed</span>
     </Forbidden>
-</PrivilegedView>
+</PrivilegeView>
 
 @* With field-level permissions *@
-<PrivilegedView Action="edit" Subject="Post" Field="title">
+<PrivilegeView Action="edit" Subject="Post" Field="title">
     <input type="text" placeholder="Edit title" />
-</PrivilegedView>
+</PrivilegeView>
 ```
 
 ### PrivilegeLink Component
