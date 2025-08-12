@@ -10,6 +10,15 @@ namespace Privileged;
 public partial record PrivilegeRule
 {
     /// <summary>
+    /// Represents a privilege rule that allows all actions and subjects.
+    /// </summary>
+    public static PrivilegeRule AllowAll { get; } = new()
+    {
+        Action = PrivilegeActions.All,
+        Subject = PrivilegeSubjects.All
+    };
+
+    /// <summary>
     /// The action to match for this rule (e.g., "Read", "Write", "Delete").
     /// </summary>
     public required string Action { get; init; }

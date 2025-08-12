@@ -39,6 +39,12 @@ public class PrivilegeContext
     public static readonly PrivilegeContext Empty = new([], []);
 
     /// <summary>
+    /// Represents a privilege context with all permissions allowed.
+    /// </summary>
+    public static readonly PrivilegeContext All = new([PrivilegeRule.AllowAll], []);
+
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="PrivilegeContext"/> class using a privilege model.
     /// </summary>
     /// <param name="model">The privilege model containing rules and aliases.</param>
