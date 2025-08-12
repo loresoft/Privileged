@@ -12,6 +12,7 @@ public partial record PrivilegeRule
     /// <summary>
     /// Represents a privilege rule that allows all actions and subjects.
     /// </summary>
+    [IgnoreEquality]
     public static PrivilegeRule AllowAll { get; } = new()
     {
         Action = PrivilegeActions.All,
