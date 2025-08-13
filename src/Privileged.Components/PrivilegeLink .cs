@@ -123,7 +123,7 @@ public class PrivilegeLink : NavLink
     /// based on the current <see cref="PrivilegeContext"/> evaluation. The computation logic is:
     /// </para>
     /// <list type="bullet">
-    /// <item><description>If <see cref="Subjects"/> is provided and contains values, evaluates using <see cref="PrivilegeContext.Any(string, IEnumerable{string})"/></description></item>
+    /// <item><description>If <see cref="Subjects"/> is provided and contains values, evaluates using <see cref="PrivilegeContextExtensions.Any(PrivilegeContext, string, IEnumerable{string})"/></description></item>
     /// <item><description>Otherwise, evaluates using <see cref="PrivilegeContext.Allowed(string?, string?, string?)"/> with <see cref="Subject"/> and <see cref="Qualifier"/></description></item>
     /// </list>
     /// <para>
