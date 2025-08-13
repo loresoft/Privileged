@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace Privileged.Authorization;
+using Privileged.Authorization;
+
+namespace Privileged.Endpoint;
 
 /// <summary>
 /// Provides extension methods for <see cref="IEndpointConventionBuilder" /> to require privileges.

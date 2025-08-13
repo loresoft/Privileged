@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 
 using Privileged.Authorization;
+using Privileged.Endpoint;
 
 namespace Sample.MinimalApi;
 

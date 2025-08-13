@@ -12,6 +12,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Privileged.Authorization\Privileged.Authorization.csproj" />
+    <ProjectReference Include="..\..\src\Privileged.Endpoint\Privileged.Endpoint.csproj" />
   </ItemGroup>
 
 </Project>

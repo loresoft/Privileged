@@ -14,6 +14,7 @@ API services, and database queries.
 | [Privileged](https://www.nuget.org/packages/Privileged/)                             | [![NuGet](https://img.shields.io/nuget/v/Privileged.svg)](https://www.nuget.org/packages/Privileged/)                             | Core authorization library for rule-based permissions                |
 | [Privileged.Authorization](https://www.nuget.org/packages/Privileged.Authorization/) | [![NuGet](https://img.shields.io/nuget/v/Privileged.Authorization.svg)](https://www.nuget.org/packages/Privileged.Authorization/) | ASP.NET Core authorization integration with attribute-based policies |
 | [Privileged.Components](https://www.nuget.org/packages/Privileged.Components/)       | [![NuGet](https://img.shields.io/nuget/v/Privileged.Components.svg)](https://www.nuget.org/packages/Privileged.Components/)       | Blazor components for privilege-aware UI elements                    |
+| [Privileged.Endpoint](https://www.nuget.org/packages/Privileged.Endpoint/)           | [![NuGet](https://img.shields.io/nuget/v/Privileged.Endpoint.svg)](https://www.nuget.org/packages/Privileged.Endpoint/)           | ASP.NET Core endpoint extensions for privilege requirements          |
 
 ## Installation
 
@@ -27,6 +28,12 @@ For ASP.NET Core applications with attribute-based authorization, also install t
 
 ```bash
 dotnet add package Privileged.Authorization
+```
+
+For ASP.NET Core applications using minimal APIs with privilege requirements, also install the endpoint package:
+
+```bash
+dotnet add package Privileged.Endpoint
 ```
 
 For Blazor applications, also install the components package:
@@ -349,9 +356,12 @@ public class PostsController : ControllerBase
 
 You can also use privilege-based authorization with ASP.NET Core Minimal APIs. The `[Privilege]` attribute works on route handler delegates, and the dynamic policies will be generated in exactly the same way.
 
+For minimal APIs that need to use the `RequirePrivilege` extension method, also add the `Privileged.Endpoint` package.
+
 ```csharp
 using Microsoft.AspNetCore.Authorization;
 using Privileged.Authorization;
+using Privileged.Endpoint;
 
 var builder = WebApplication.CreateBuilder(args);
 

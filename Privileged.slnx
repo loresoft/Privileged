@@ -17,5 +17,6 @@
   </Folder>
   <Project Path="src/Privileged.Authorization/Privileged.Authorization.csproj" Id="9e8613cb-6037-4223-93e7-b413e1272671" />
   <Project Path="src/Privileged.Components/Privileged.Components.csproj" />
+  <Project Path="src/Privileged.Endpoint/Privileged.Endpoint.csproj" Id="6cd69d03-4a86-4eb5-a6ba-32602816d2d2" />
   <Project Path="src/Privileged/Privileged.csproj" />
 </Solution>
