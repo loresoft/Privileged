@@ -47,6 +47,7 @@ jobs:
       - name: Report Coverage
         if: success()
         uses: coverallsapp/github-action@v2
+        continue-on-error: true
         with:
           file: "${{github.workspace}}/test/*/TestResults/*/coverage.info"
           format: lcov
