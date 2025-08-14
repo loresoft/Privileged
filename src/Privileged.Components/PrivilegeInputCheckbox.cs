@@ -61,7 +61,7 @@ public class PrivilegeInputCheckbox : InputCheckbox
         if (PrivilegeContext == null)
             throw new InvalidOperationException("Component requires a cascading parameter of type PrivilegeContext.");
 
-        var subject = Subject ?? EditContext.Model.GetType().Name;
+        var subject = Subject ?? EditContext?.Model.GetType().Name;
         var qualifier = Field ?? NameAttributeValue;
 
         HasReadPermission = PrivilegeContext.Allowed(ReadAction, subject, qualifier);
