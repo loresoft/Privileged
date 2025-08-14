@@ -16,6 +16,7 @@ public class PrivilegeInputTextArea : InputTextArea
 
     /// <summary>
     /// Gets or sets the subject for privilege evaluation. Defaults to the model's type name if not specified.
+    /// When null, empty, or whitespace, all privileges are assumed to be granted.
     /// </summary>
     [Parameter]
     public string? Subject { get; set; }
@@ -64,8 +65,11 @@ public class PrivilegeInputTextArea : InputTextArea
         var subject = Subject ?? EditContext?.Model.GetType().Name;
         var qualifier = Field ?? NameAttributeValue;
 
-        HasReadPermission = PrivilegeContext.Allowed(ReadAction, subject, qualifier);
-        HasUpdatePermission = PrivilegeContext.Allowed(UpdateAction, subject, qualifier);
+        HasReadPermission = string.IsNullOrWhiteSpace(Subject)
+            || PrivilegeContext.Allowed(ReadAction, subject, qualifier);
+
+        HasUpdatePermission = string.IsNullOrWhiteSpace(Subject)
+            || PrivilegeContext.Allowed(UpdateAction, subject, qualifier);
 
         if (HasUpdatePermission)
             return;

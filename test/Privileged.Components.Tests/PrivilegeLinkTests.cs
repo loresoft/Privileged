@@ -139,6 +139,95 @@ public class PrivilegeLinkTests : TestContext
     }
 
     [Fact]
+    public void EmptySubject_AssumeAllPrivileges_RendersLink()
+    {
+        // Arrange
+        var context = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        // Act
+        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Subject, "") // Empty subject - should assume all privileges
+            .Add(p => p.Action, "read")
+            .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "View Posts"))
+        );
+
+        // Assert
+        cut.Find("a").Should().NotBeNull();
+        cut.Find("a").GetAttribute("href").Should().Be("/posts");
+        cut.Find("a").TextContent.Should().Be("View Posts");
+    }
+
+    [Fact]
+    public void NullSubject_AssumeAllPrivileges_RendersLink()
+    {
+        // Arrange
+        var context = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        // Act
+        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Subject, (string?)null) // Null subject - should assume all privileges
+            .Add(p => p.Action, "read")
+            .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "View Posts"))
+        );
+
+        // Assert
+        cut.Find("a").Should().NotBeNull();
+        cut.Find("a").GetAttribute("href").Should().Be("/posts");
+        cut.Find("a").TextContent.Should().Be("View Posts");
+    }
+
+    [Fact]
+    public void WhitespaceSubject_AssumeAllPrivileges_RendersLink()
+    {
+        // Arrange
+        var context = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        // Act
+        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Subject, "   ") // Whitespace subject - should assume all privileges
+            .Add(p => p.Action, "read")
+            .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "View Posts"))
+        );
+
+        // Assert
+        cut.Find("a").Should().NotBeNull();
+        cut.Find("a").GetAttribute("href").Should().Be("/posts");
+        cut.Find("a").TextContent.Should().Be("View Posts");
+    }
+
+    [Fact]
+    public void EmptySubject_WithQualifier_StillAssumeAllPrivileges()
+    {
+        // Arrange
+        var context = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        // Act
+        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Subject, "") // Empty subject
+            .Add(p => p.Action, "edit")
+            .Add(p => p.Qualifier, "title") // Even with qualifier, should work
+            .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts/edit" } })
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "Edit Title"))
+        );
+
+        // Assert
+        cut.Find("a").Should().NotBeNull();
+        cut.Find("a").GetAttribute("href").Should().Be("/posts/edit");
+        cut.Find("a").TextContent.Should().Be("Edit Title");
+    }
+
+    [Fact]
     public void ThrowsExceptionWhenNoPrivilegeContext()
     {
         // Act & Assert
@@ -396,6 +485,29 @@ public class PrivilegeLinkTests : TestContext
         cut.Find("a").Should().NotBeNull();
         cut.Find("a").GetAttribute("href").Should().Be("/comments/edit");
         cut.Find("a").TextContent.Should().Be("Edit Comments");
+    }
+
+    [Fact]
+    public void SubjectsParameter_WithEmptySubjectsAndEmptySubject_AssumeAllPrivileges()
+    {
+        // Arrange
+        var context = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        // Act
+        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Action, "read")
+            .Add(p => p.Subject, "") // Empty subject
+            .Add(p => p.Subjects, new string[0]) // Empty subjects collection
+            .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "View Posts"))
+        );
+
+        // Assert
+        cut.Find("a").Should().NotBeNull();
+        cut.Find("a").GetAttribute("href").Should().Be("/posts");
+        cut.Find("a").TextContent.Should().Be("View Posts");
     }
 
     [Fact]

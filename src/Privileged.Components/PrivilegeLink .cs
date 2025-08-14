@@ -62,16 +62,24 @@ public class PrivilegeLink : NavLink
 
     /// <summary>
     /// Gets or sets the subject to authorize for the navigation link.
+    /// When null, empty, or whitespace, all privileges are assumed to be granted.
     /// </summary>
     /// <value>
     /// The subject name representing the resource or entity to check permissions for
     /// (e.g., "Post", "User", "Order"). This parameter is mutually exclusive with <see cref="Subjects"/>.
     /// </value>
     /// <remarks>
+    /// <para>
     /// The subject typically represents a business entity, resource type, or domain object
     /// that the user wants to perform an action on. When both <see cref="Subject"/> and
     /// <see cref="Subjects"/> are provided, <see cref="Subjects"/> takes precedence and
     /// this parameter is ignored.
+    /// </para>
+    /// <para>
+    /// <strong>Special behavior:</strong> When the Subject parameter is <c>null</c>, empty, or contains only whitespace,
+    /// the component assumes all privileges are granted and will render the navigation link regardless
+    /// of the privilege context rules. This allows for fallback behavior when subject information is not available.
+    /// </para>
     /// </remarks>
     [Parameter]
     public string? Subject { get; set; }
@@ -169,7 +177,8 @@ public class PrivilegeLink : NavLink
             return;
         }
 
-        HasPermission = PrivilegeContext.Allowed(Action, Subject, Qualifier);
+        HasPermission = string.IsNullOrWhiteSpace(Subject)
+            || PrivilegeContext.Allowed(Action, Subject, Qualifier);
     }
 
     /// <summary>

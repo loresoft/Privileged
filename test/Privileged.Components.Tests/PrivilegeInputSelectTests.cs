@@ -98,6 +98,130 @@ public class PrivilegeInputSelectTests : TestContext
     }
 
     [Fact]
+    public void EmptySubject_AssumeAllPrivileges_RendersNormalSelect()
+    {
+        var model = new TestModel { Option = "B" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Option)
+            .Add(p => p.ValueExpression, () => model.Option)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string>(this, v => model.Option = v))
+            .Add(p => p.Subject, "") // Empty subject - should assume all privileges
+            .Add(p => p.Field, nameof(TestModel.Option))
+            .Add(p => p.ChildContent, (RenderFragment)(builder =>
+            {
+                builder.OpenElement(0, "option");
+                builder.AddAttribute(1, "value", "A");
+                builder.AddContent(2, "Option A");
+                builder.CloseElement();
+                builder.OpenElement(3, "option");
+                builder.AddAttribute(4, "value", "B");
+                builder.AddContent(5, "Option B");
+                builder.CloseElement();
+            }))
+        );
+
+        cut.Find("select").HasAttribute("disabled").Should().BeFalse();
+    }
+
+    [Fact]
+    public void NullSubject_AssumeAllPrivileges_RendersNormalSelect()
+    {
+        var model = new TestModel { Option = "B" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Option)
+            .Add(p => p.ValueExpression, () => model.Option)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string>(this, v => model.Option = v))
+            .Add(p => p.Subject, (string?)null) // Null subject - should assume all privileges
+            .Add(p => p.Field, nameof(TestModel.Option))
+            .Add(p => p.ChildContent, (RenderFragment)(builder =>
+            {
+                builder.OpenElement(0, "option");
+                builder.AddAttribute(1, "value", "A");
+                builder.AddContent(2, "Option A");
+                builder.CloseElement();
+                builder.OpenElement(3, "option");
+                builder.AddAttribute(4, "value", "B");
+                builder.AddContent(5, "Option B");
+                builder.CloseElement();
+            }))
+        );
+
+        cut.Find("select").HasAttribute("disabled").Should().BeFalse();
+    }
+
+    [Fact]
+    public void WhitespaceSubject_AssumeAllPrivileges_RendersNormalSelect()
+    {
+        var model = new TestModel { Option = "B" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Option)
+            .Add(p => p.ValueExpression, () => model.Option)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string>(this, v => model.Option = v))
+            .Add(p => p.Subject, "   ") // Whitespace subject - should assume all privileges
+            .Add(p => p.Field, nameof(TestModel.Option))
+            .Add(p => p.ChildContent, (RenderFragment)(builder =>
+            {
+                builder.OpenElement(0, "option");
+                builder.AddAttribute(1, "value", "A");
+                builder.AddContent(2, "Option A");
+                builder.CloseElement();
+                builder.OpenElement(3, "option");
+                builder.AddAttribute(4, "value", "B");
+                builder.AddContent(5, "Option B");
+                builder.CloseElement();
+            }))
+        );
+
+        cut.Find("select").HasAttribute("disabled").Should().BeFalse();
+    }
+
+    [Fact]
+    public void EmptySubject_WithField_StillAssumeAllPrivileges()
+    {
+        var model = new TestModel { Option = "B" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Option)
+            .Add(p => p.ValueExpression, () => model.Option)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string>(this, v => model.Option = v))
+            .Add(p => p.Subject, "") // Empty subject
+            .Add(p => p.Field, "RestrictedField") // Even with restricted field, should work
+            .Add(p => p.ChildContent, (RenderFragment)(builder =>
+            {
+                builder.OpenElement(0, "option");
+                builder.AddAttribute(1, "value", "A");
+                builder.AddContent(2, "Option A");
+                builder.CloseElement();
+            }))
+        );
+
+        cut.Find("select").HasAttribute("disabled").Should().BeFalse();
+    }
+
+    [Fact]
     public void Throws_When_No_PrivilegeContext_Provided()
     {
         var model = new TestModel { Option = "B" };
@@ -116,5 +240,35 @@ public class PrivilegeInputSelectTests : TestContext
         });
 
         exception.Message.Should().Contain("PrivilegeContext");
+    }
+
+    [Fact]
+    public void WithCustomActions_EmptySubject_AssumeAllPrivileges()
+    {
+        var model = new TestModel { Option = "B" };
+        var editContext = new EditContext(model);
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+            .AddCascadingValue(editContext)
+            .AddCascadingValue(ctx)
+            .Add(p => p.Value, model.Option)
+            .Add(p => p.ValueExpression, () => model.Option)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string>(this, v => model.Option = v))
+            .Add(p => p.Subject, "") // Empty subject
+            .Add(p => p.Field, nameof(TestModel.Option))
+            .Add(p => p.ReadAction, "view") // Custom read action
+            .Add(p => p.UpdateAction, "modify") // Custom update action
+            .Add(p => p.ChildContent, (RenderFragment)(builder =>
+            {
+                builder.OpenElement(0, "option");
+                builder.AddAttribute(1, "value", "A");
+                builder.AddContent(2, "Option A");
+                builder.CloseElement();
+            }))
+        );
+
+        cut.Find("select").HasAttribute("disabled").Should().BeFalse();
     }
 }

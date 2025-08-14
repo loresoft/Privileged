@@ -62,6 +62,103 @@ public class PrivilegeButtonTests : TestContext
     }
 
     [Fact]
+    public void EmptySubject_AssumeAllPrivileges_RendersEnabledButton()
+    {
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeButton>(ps => ps
+            .AddCascadingValue(ctx)
+            .Add(p => p.Action, "create")
+            .Add(p => p.Subject, "") // Empty subject - should assume all privileges
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "Create Post"))
+        );
+
+        var button = cut.Find("button");
+        button.Should().NotBeNull();
+        button.HasAttribute("disabled").Should().BeFalse();
+        button.TextContent.Should().Be("Create Post");
+    }
+
+    [Fact]
+    public void NullSubject_AssumeAllPrivileges_RendersEnabledButton()
+    {
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeButton>(ps => ps
+            .AddCascadingValue(ctx)
+            .Add(p => p.Action, "create")
+            .Add(p => p.Subject, (string?)null) // Null subject - should assume all privileges
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "Create Post"))
+        );
+
+        var button = cut.Find("button");
+        button.Should().NotBeNull();
+        button.HasAttribute("disabled").Should().BeFalse();
+        button.TextContent.Should().Be("Create Post");
+    }
+
+    [Fact]
+    public void WhitespaceSubject_AssumeAllPrivileges_RendersEnabledButton()
+    {
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeButton>(ps => ps
+            .AddCascadingValue(ctx)
+            .Add(p => p.Action, "create")
+            .Add(p => p.Subject, "   ") // Whitespace subject - should assume all privileges
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "Create Post"))
+        );
+
+        var button = cut.Find("button");
+        button.Should().NotBeNull();
+        button.HasAttribute("disabled").Should().BeFalse();
+        button.TextContent.Should().Be("Create Post");
+    }
+
+    [Fact]
+    public void EmptySubject_WithQualifier_StillAssumeAllPrivileges()
+    {
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeButton>(ps => ps
+            .AddCascadingValue(ctx)
+            .Add(p => p.Action, "update")
+            .Add(p => p.Subject, "") // Empty subject
+            .Add(p => p.Qualifier, "title") // Even with qualifier, should work
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "Update Title"))
+        );
+
+        var button = cut.Find("button");
+        button.Should().NotBeNull();
+        button.HasAttribute("disabled").Should().BeFalse();
+        button.TextContent.Should().Be("Update Title");
+    }
+
+    [Fact]
+    public void EmptySubject_WithHideForbidden_DoesNotHide()
+    {
+        var ctx = new PrivilegeBuilder()
+            .Build(); // No specific permissions
+
+        var cut = RenderComponent<PrivilegeButton>(ps => ps
+            .AddCascadingValue(ctx)
+            .Add(p => p.Action, "create")
+            .Add(p => p.Subject, "") // Empty subject - should assume all privileges
+            .Add(p => p.HideForbidden, true) // Should not hide because all privileges are assumed
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "Create Post"))
+        );
+
+        var button = cut.Find("button");
+        button.Should().NotBeNull();
+        button.HasAttribute("disabled").Should().BeFalse();
+        button.TextContent.Should().Be("Create Post");
+    }
+
+    [Fact]
     public void Button_Disabled_When_Disabled_Property_True()
     {
         var ctx = new PrivilegeBuilder()

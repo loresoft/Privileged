@@ -143,6 +143,7 @@ public class PrivilegeView : ComponentBase
     /// <summary>
     /// Gets or sets the subject to authorize the action against.
     /// The subject typically represents a resource, entity type, or domain object.
+    /// When null, empty, or whitespace, all privileges are assumed to be granted.
     /// </summary>
     /// <value>
     /// A string representing the subject to check permissions for (e.g., "Post", "User", "Document").
@@ -163,6 +164,11 @@ public class PrivilegeView : ComponentBase
     /// Subjects can be literal values or constants from <see cref="PrivilegeSubjects"/> if using
     /// predefined subject types. Wildcard subjects like <see cref="PrivilegeSubjects.All"/> are supported
     /// if defined in the privilege rules.
+    /// </para>
+    /// <para>
+    /// <strong>Special behavior:</strong> When the Subject parameter is <c>null</c>, empty, or contains only whitespace,
+    /// the component assumes all privileges are granted and will render the authorized content regardless
+    /// of the privilege context rules. This allows for fallback behavior when subject information is not available.
     /// </para>
     /// </remarks>
     [Parameter]
@@ -346,6 +352,7 @@ public class PrivilegeView : ComponentBase
             return;
         }
 
-        IsAllowed = PrivilegeContext?.Allowed(Action, Subject, Qualifier);
+        IsAllowed = string.IsNullOrWhiteSpace(Subject)
+            || PrivilegeContext?.Allowed(Action, Subject, Qualifier) == true;
     }
 }

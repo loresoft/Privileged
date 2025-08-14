@@ -66,12 +66,13 @@ public class PrivilegeButton : ComponentBase
     /// current user's privileges to determine if the button should be enabled.
     /// </para>
     /// </remarks>
-    [Parameter, EditorRequired]
-    public required string Action { get; set; }
+    [Parameter]
+    public string? Action { get; set; }
 
     /// <summary>
     /// Gets or sets the subject to authorize for this button.
     /// The subject typically represents a resource, entity type, or domain object.
+    /// When null, empty, or whitespace, all privileges are assumed to be granted.
     /// </summary>
     /// <value>
     /// The subject name representing the resource or entity to check permissions for (e.g., "Post", "User", "Order").
@@ -82,9 +83,14 @@ public class PrivilegeButton : ComponentBase
     /// The subject represents the target of the action - what the user is trying to perform the action on.
     /// For instance, in a content management system, subjects might include "Post", "Page", "User", or "Comment".
     /// </para>
+    /// <para>
+    /// <strong>Special behavior:</strong> When the Subject parameter is <c>null</c>, empty, or contains only whitespace,
+    /// the component assumes all privileges are granted and will enable the button regardless
+    /// of the privilege context rules. This allows for fallback behavior when subject information is not available.
+    /// </para>
     /// </remarks>
-    [Parameter, EditorRequired]
-    public required string Subject { get; set; }
+    [Parameter]
+    public string? Subject { get; set; }
 
     /// <summary>
     /// Gets or sets an optional qualifier that provides additional scoping for the privilege evaluation.
@@ -293,7 +299,9 @@ public class PrivilegeButton : ComponentBase
 
         BusyTemplate ??= builder => builder.AddContent(0, BusyText);
 
-        HasPermission = PrivilegeContext.Allowed(Action, Subject, Qualifier);
+        HasPermission = string.IsNullOrWhiteSpace(Action)
+            || string.IsNullOrWhiteSpace(Subject)
+            || PrivilegeContext.Allowed(Action, Subject, Qualifier);
     }
 
     /// <summary>
