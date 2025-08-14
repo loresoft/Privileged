@@ -1,3 +1,5 @@
+using System;
+
 namespace Privileged.Components.Tests;
 
 internal class TestModel
@@ -7,4 +9,5 @@ internal class TestModel
     public bool IsActive { get; set; }
     public string Option { get; set; } = "A";
     public string Description { get; set; } = "";
+    public DateTime DateOfBirth { get; set; } = new DateTime(1990, 1, 1);
 }
