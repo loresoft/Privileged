@@ -118,6 +118,17 @@ public class PrivilegeLink : NavLink
     public string? Qualifier { get; set; }
 
     /// <summary>
+    /// Gets or sets a value indicating whether links should be hidden when the user
+    /// lacks the required permissions instead of being displayed in a disabled state.
+    /// </summary>
+    /// <value>
+    /// <c>true</c> to hide the link when permission is denied; <c>false</c> to show
+    /// the link in a disabled state. Defaults to <c>false</c>.
+    /// </value>
+    [Parameter]
+    public bool HideForbidden { get; set; }
+
+    /// <summary>
     /// Gets a value indicating whether the user has permission to access this navigation link.
     /// </summary>
     /// <value>
@@ -203,9 +214,22 @@ public class PrivilegeLink : NavLink
     /// </remarks>
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
-        if (!HasPermission)
+        // Do not render if the user does not have permission and HideForbidden is true
+        if (HideForbidden && !HasPermission)
             return;
 
-        base.BuildRenderTree(builder);
+        // render normally if we have permission
+        if (HasPermission)
+        {
+            base.BuildRenderTree(builder);
+            return;
+        }
+
+        // render a span with the same attributes if no permission
+        builder.OpenElement(0, "span");
+        builder.AddMultipleAttributes(1, AdditionalAttributes);
+        builder.AddAttribute(2, "class", CssClass);
+        builder.AddContent(3, ChildContent);
+        builder.CloseElement();
     }
 }
