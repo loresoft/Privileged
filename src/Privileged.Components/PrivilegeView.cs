@@ -133,7 +133,7 @@ public class PrivilegeView : ComponentBase
     /// </para>
     /// <para>
     /// Actions can be literal values or constants from <see cref="PrivilegeRule"/> if using
-    /// predefined action types. Wildcard actions like <see cref="PrivilegeRule.All"/> are supported
+    /// predefined action types. Wildcard actions like <see cref="PrivilegeRule.Any"/> are supported
     /// if defined in the privilege rules.
     /// </para>
     /// </remarks>
@@ -162,7 +162,7 @@ public class PrivilegeView : ComponentBase
     /// </para>
     /// <para>
     /// Subjects can be literal values or constants from <see cref="PrivilegeRule"/> if using
-    /// predefined subject types. Wildcard subjects like <see cref="PrivilegeRule.All"/> are supported
+    /// predefined subject types. Wildcard subjects like <see cref="PrivilegeRule.Any"/> are supported
     /// if defined in the privilege rules.
     /// </para>
     /// <para>

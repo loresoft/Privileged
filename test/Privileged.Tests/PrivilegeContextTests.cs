@@ -6,8 +6,8 @@ public class PrivilegeContextTests
     public void AllowByDefault()
     {
         var context = new PrivilegeBuilder()
-            .Allow("test", PrivilegeRule.All)
-            .Allow(PrivilegeRule.All, "Post")
+            .Allow("test", PrivilegeRule.Any)
+            .Allow(PrivilegeRule.Any, "Post")
             .Forbid("publish", "Post")
             .Build();
 
@@ -104,6 +104,9 @@ public class PrivilegeContextTests
         context.Allowed("read", "Post").Should().BeTrue();
         context.Allowed("read", "User").Should().BeTrue();
         context.Allowed("read", "Article").Should().BeFalse();
+
+        context.Allowed("read", PrivilegeRule.Any).Should().BeTrue();
+        context.Allowed(PrivilegeRule.Any, "User").Should().BeTrue();
     }
 
     [Fact]
@@ -115,6 +118,7 @@ public class PrivilegeContextTests
             .Build();
 
         context.Allowed("read", "Post").Should().BeFalse();
+        context.Allowed("read", "Post", PrivilegeRule.Any).Should().BeTrue();
         context.Allowed("read", "Post", "title").Should().BeTrue();
         context.Allowed("read", "Post", "id").Should().BeTrue();
 
@@ -133,16 +137,18 @@ public class PrivilegeContextTests
             .Forbid("Delete", "User")                           // Forbids deleting User
             .Build();
 
-        bool canCreateProject = context.Allowed("Create", "Project");           // true
-        bool canReadUser = context.Allowed("Read", "User");                     // true
-        bool canUpdateProfile = context.Allowed("Update", "User", "Profile");   // true
-        bool canUpdatePassword = context.Allowed("Update", "User", "Password"); // false
-        bool canDeleteUser = context.Allowed("Delete", "User");                 // false
+        bool canCreateProject = context.Allowed("Create", "Project");               // true
+        bool canReadUser = context.Allowed("Read", "User");                         // true
+        bool canUpdateProfile = context.Allowed("Update", "User", "Profile");       // true
+        bool canUpdatePassword = context.Allowed("Update", "User", "Password");     // false
+        bool canUpdateAny = context.Allowed("Update", "User", PrivilegeRule.Any);   // true
+        bool canDeleteUser = context.Allowed("Delete", "User");                     // false
 
         canCreateProject.Should().BeTrue();
         canReadUser.Should().BeTrue();
         canUpdateProfile.Should().BeTrue();
         canUpdatePassword.Should().BeFalse();
+        canUpdateAny.Should().BeTrue();
         canDeleteUser.Should().BeFalse();
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Concurrent;
 using System.Reflection;
 
@@ -16,7 +17,7 @@ namespace Privileged;
 /// <list type="bullet">
 /// <item><description>Rule-based authorization with allow and forbid permissions.</description></item>
 /// <item><description>Alias expansion for actions, subjects, and qualifiers.</description></item>
-/// <item><description>Wildcard matching using <see cref="PrivilegeRule.All"/> and <see cref="PrivilegeRule.All"/>.</description></item>
+/// <item><description>Wildcard matching using <see cref="PrivilegeRule.Any"/> and <see cref="PrivilegeRule.Any"/>.</description></item>
 /// <item><description>Field-level permissions through qualifiers.</description></item>
 /// <item><description>Customizable string comparison for rule matching.</description></item>
 /// </list>
@@ -41,7 +42,7 @@ public class PrivilegeContext
     /// <summary>
     /// Represents a privilege context with all permissions allowed.
     /// </summary>
-    public static readonly PrivilegeContext All = new([PrivilegeRule.AllowAll], []);
+    public static readonly PrivilegeContext All = new([PrivilegeRule.AllowAny], []);
 
 
     /// <summary>
@@ -216,12 +217,16 @@ public class PrivilegeContext
 
     private bool SubjectMatcher(PrivilegeRule rule, string subject)
     {
+        // wildcard match optimization
+        if (StringComparer.Equals(subject, PrivilegeRule.Any))
+            return true;
+
         // Direct match optimization
         if (StringComparer.Equals(rule.Subject, subject))
             return true;
 
         // wildcard match optimization
-        if (StringComparer.Equals(rule.Subject, PrivilegeRule.All))
+        if (StringComparer.Equals(rule.Subject, PrivilegeRule.Any))
             return true;
 
         // Alias match
@@ -230,12 +235,16 @@ public class PrivilegeContext
 
     private bool ActionMatcher(PrivilegeRule rule, string action)
     {
+        // wildcard match optimization
+        if (StringComparer.Equals(action, PrivilegeRule.Any))
+            return true;
+
         // Direct match optimization
         if (StringComparer.Equals(rule.Action, action))
             return true;
 
         // wildcard match optimization
-        if (StringComparer.Equals(rule.Action, PrivilegeRule.All))
+        if (StringComparer.Equals(rule.Action, PrivilegeRule.Any))
             return true;
 
         // Alias match
@@ -253,6 +262,10 @@ public class PrivilegeContext
 
         // Qualifier specified in request but not in rule
         if (hasValue && !hasQualifiers)
+            return true;
+
+        // wildcard match optimization
+        if (StringComparer.Equals(qualifier, PrivilegeRule.Any))
             return true;
 
         // No qualifier specified in request but required by rule

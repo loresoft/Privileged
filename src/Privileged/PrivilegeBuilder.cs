@@ -149,11 +149,11 @@ public class PrivilegeBuilder
     /// </summary>
     /// <param name="action">
     /// The action to allow (e.g., "read", "create", "update").
-    /// Can be a wildcard using <see cref="PrivilegeRule.All"/> to match any action.
+    /// Can be a wildcard using <see cref="PrivilegeRule.Any"/> to match any action.
     /// </param>
     /// <param name="subject">
     /// The subject to allow (e.g., a resource or entity name like "Post", "User").
-    /// Can be a wildcard using <see cref="PrivilegeRule.All"/> to match any subject.
+    /// Can be a wildcard using <see cref="PrivilegeRule.Any"/> to match any subject.
     /// </param>
     /// <param name="qualifiers">
     /// An optional collection of qualifiers that further scope the rule (e.g., field names, tags, or regions).
@@ -209,11 +209,11 @@ public class PrivilegeBuilder
     /// </summary>
     /// <param name="action">
     /// The action to forbid (e.g., "delete", "update", "publish").
-    /// Can be a wildcard using <see cref="PrivilegeRule.All"/> to forbid any action.
+    /// Can be a wildcard using <see cref="PrivilegeRule.Any"/> to forbid any action.
     /// </param>
     /// <param name="subject">
     /// The subject to forbid (e.g., a resource or entity name like "Post", "User").
-    /// Can be a wildcard using <see cref="PrivilegeRule.All"/> to forbid on any subject.
+    /// Can be a wildcard using <see cref="PrivilegeRule.Any"/> to forbid on any subject.
     /// </param>
     /// <param name="qualifiers">
     /// An optional collection of qualifiers that further scope the rule (e.g., field names, tags, or regions).

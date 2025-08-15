@@ -71,7 +71,7 @@ public class PrivilegeContextOriginal
     {
         // can match global all or requested subject
         return StringComparer.Equals(rule.Subject, subject)
-               || StringComparer.Equals(rule.Subject, PrivilegeRule.All)
+               || StringComparer.Equals(rule.Subject, PrivilegeRule.Any)
                || AliasMatcher(rule.Subject, subject, PrivilegeMatch.Subject);
     }
 
@@ -79,7 +79,7 @@ public class PrivilegeContextOriginal
     {
         // can match global manage action or requested action
         return StringComparer.Equals(rule.Action, action)
-               || StringComparer.Equals(rule.Action, PrivilegeRule.All)
+               || StringComparer.Equals(rule.Action, PrivilegeRule.Any)
                || AliasMatcher(rule.Action, action, PrivilegeMatch.Action);
     }
 

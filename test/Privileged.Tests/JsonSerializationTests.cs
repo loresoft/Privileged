@@ -19,8 +19,8 @@ public class JsonSerializationTests
     public void SerializationRules()
     {
         var context = new PrivilegeBuilder()
-            .Allow("test", PrivilegeRule.All)
-            .Allow(PrivilegeRule.All, "Post")
+            .Allow("test", PrivilegeRule.Any)
+            .Allow(PrivilegeRule.Any, "Post")
             .Allow("read", "User", ["title", "id"])
             .Forbid("publish", "Post")
             .Build();

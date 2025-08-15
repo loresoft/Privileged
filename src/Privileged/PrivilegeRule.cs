@@ -10,19 +10,19 @@ namespace Privileged;
 public partial record PrivilegeRule
 {
     /// <summary>
-    /// A special keyword indicating that the rule applies to all subjects, actions and qualifiers.
+    /// A special keyword indicating that the rule applies to any subjects, actions and qualifiers.
     /// When used in a rule, it matches any value.
     /// </summary>
-    public const string All = "*";
+    public const string Any = "*";
 
     /// <summary>
-    /// Represents a privilege rule that allows all actions and subjects.
+    /// Represents a privilege rule that allows any actions and subjects.
     /// </summary>
     [IgnoreEquality]
-    public static PrivilegeRule AllowAll { get; } = new()
+    public static PrivilegeRule AllowAny { get; } = new()
     {
-        Action = All,
-        Subject = All
+        Action = Any,
+        Subject = Any
     };
 
     /// <summary>

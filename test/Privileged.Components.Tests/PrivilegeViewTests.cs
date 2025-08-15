@@ -272,7 +272,7 @@ public class PrivilegeViewTests : TestContext
     public void SubjectsParameter_WithWildcardPermissions_RendersContent()
     {
         var context = new PrivilegeBuilder()
-            .Allow("read", PrivilegeRule.All) // Allow read on all subjects
+            .Allow("read", PrivilegeRule.Any) // Allow read on all subjects
             .Build();
 
         var cut = RenderComponent<PrivilegeView>(parameters => parameters
