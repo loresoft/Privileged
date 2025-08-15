@@ -6,8 +6,8 @@ public class PrivilegeContextTests
     public void AllowByDefault()
     {
         var context = new PrivilegeBuilder()
-            .Allow("test", PrivilegeSubjects.All)
-            .Allow(PrivilegeActions.All, "Post")
+            .Allow("test", PrivilegeRule.All)
+            .Allow(PrivilegeRule.All, "Post")
             .Forbid("publish", "Post")
             .Build();
 

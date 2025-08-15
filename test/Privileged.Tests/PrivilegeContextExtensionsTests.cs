@@ -521,8 +521,8 @@ public class PrivilegeContextExtensionsTests
     {
         // Arrange
         var context = new PrivilegeBuilder()
-            .Allow(PrivilegeActions.All, "Post")
-            .Allow("read", PrivilegeSubjects.All)
+            .Allow(PrivilegeRule.All, "Post")
+            .Allow("read", PrivilegeRule.All)
             .Forbid("delete", "User")
             .Build();
 
@@ -563,7 +563,7 @@ public class PrivilegeContextExtensionsTests
             .Allow("read", "Comment")
             .Allow("write", "Post")
             .Forbid("delete", "Post")
-            .Allow("admin", PrivilegeSubjects.All)
+            .Allow("admin", PrivilegeRule.All)
             .Forbid("admin", "SecretDocument")
             .Build();
 

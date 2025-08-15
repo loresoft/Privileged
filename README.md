@@ -88,9 +88,9 @@ Use wildcards to allow all actions on a subject or an action on all subjects:
 
 ```csharp
 var context = new PrivilegeBuilder()
-    .Allow("test", PrivilegeSubjects.All)    // Allow 'test' action on any subject
-    .Allow(PrivilegeActions.All, "Post")     // Allow any action on 'Post'
-    .Forbid("publish", "Post")               // Forbid overrides allow
+    .Allow("test", PrivilegeRule.All)     // Allow 'test' action on any subject
+    .Allow(PrivilegeRule.All, "Post")     // Allow any action on 'Post'
+    .Forbid("publish", "Post")            // Forbid overrides allow
     .Build();
 
 context.Allowed("read", "Post").Should().BeTrue();
@@ -110,7 +110,7 @@ Qualifiers provide field-level or fine-grained permissions:
 ```csharp
 var context = new PrivilegeBuilder()
     .Allow("read", "Post", ["title", "id"])   // Only allow reading specific fields
-    .Allow("read", "User")                     // Allow reading all User fields
+    .Allow("read", "User")                    // Allow reading all User fields
     .Build();
 
 // Post permissions with qualifiers
@@ -186,7 +186,7 @@ Rules are evaluated in the order they are defined, with more specific rules taki
 
 1. **Forbid rules** always take precedence over allow rules when both match
 2. Rules are matched based on exact string comparison (case-insensitive by default)
-3. Wildcard rules (`PrivilegeActions.All`, `PrivilegeSubjects.All`) match any value
+3. Wildcard rules (`PrivilegeRule.All`, `PrivilegeRule.All`) match any value
 4. Alias expansion happens during rule matching
 
 ### String Comparison

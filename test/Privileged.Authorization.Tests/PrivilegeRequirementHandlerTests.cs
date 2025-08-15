@@ -199,8 +199,8 @@ public class PrivilegeRequirementHandlerTests
     {
         // Arrange
         var privilegeContext = new PrivilegeBuilder()
-            .Allow("read", PrivilegeSubjects.All)
-            .Allow(PrivilegeActions.All, "Post")
+            .Allow("read", PrivilegeRule.All)
+            .Allow(PrivilegeRule.All, "Post")
             .Forbid("delete", "Post")
             .Build();
 

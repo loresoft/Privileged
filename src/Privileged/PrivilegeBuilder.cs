@@ -50,16 +50,16 @@ namespace Privileged;
 /// <para>Using wildcard constants for global rules:</para>
 /// <code>
 /// var context = new PrivilegeBuilder()
-///     .Allow("read", PrivilegeSubjects.All)     // Allow reading any subject
-///     .Allow(PrivilegeActions.All, "Post")      // Allow any action on posts
-///     .Forbid("delete", PrivilegeSubjects.All)  // Forbid deleting anything
+///     .Allow("read", PrivilegeRule.All)     // Allow reading any subject
+///     .Allow(PrivilegeRule.All, "Post")      // Allow any action on posts
+///     .Forbid("delete", PrivilegeRule.All)  // Forbid deleting anything
 ///     .Build();
 /// </code>
 /// </example>
 /// <seealso cref="PrivilegeContext"/>
 /// <seealso cref="PrivilegeBuilderExtensions"/>
-/// <seealso cref="PrivilegeSubjects"/>
-/// <seealso cref="PrivilegeActions"/>
+/// <seealso cref="PrivilegeRule"/>
+/// <seealso cref="PrivilegeRule"/>
 public class PrivilegeBuilder
 {
     private readonly List<PrivilegeRule> _rules = [];
@@ -149,11 +149,11 @@ public class PrivilegeBuilder
     /// </summary>
     /// <param name="action">
     /// The action to allow (e.g., "read", "create", "update").
-    /// Can be a wildcard using <see cref="PrivilegeActions.All"/> to match any action.
+    /// Can be a wildcard using <see cref="PrivilegeRule.All"/> to match any action.
     /// </param>
     /// <param name="subject">
     /// The subject to allow (e.g., a resource or entity name like "Post", "User").
-    /// Can be a wildcard using <see cref="PrivilegeSubjects.All"/> to match any subject.
+    /// Can be a wildcard using <see cref="PrivilegeRule.All"/> to match any subject.
     /// </param>
     /// <param name="qualifiers">
     /// An optional collection of qualifiers that further scope the rule (e.g., field names, tags, or regions).
@@ -180,8 +180,8 @@ public class PrivilegeBuilder
     /// var builder = new PrivilegeBuilder()
     ///     .Allow("read", "Post")                                  // Basic rule
     ///     .Allow("edit", "Post", new[] { "title", "content" })    // Rule with qualifiers
-    ///     .Allow(PrivilegeActions.All, "Comment")                 // Wildcard action
-    ///     .Allow("manage", PrivilegeSubjects.All);                // Wildcard subject
+    ///     .Allow(PrivilegeRule.All, "Comment")                 // Wildcard action
+    ///     .Allow("manage", PrivilegeRule.All);                // Wildcard subject
     /// </code>
     /// </example>
     /// <seealso cref="Forbid(string, string, IEnumerable{string}?)"/>
@@ -209,11 +209,11 @@ public class PrivilegeBuilder
     /// </summary>
     /// <param name="action">
     /// The action to forbid (e.g., "delete", "update", "publish").
-    /// Can be a wildcard using <see cref="PrivilegeActions.All"/> to forbid any action.
+    /// Can be a wildcard using <see cref="PrivilegeRule.All"/> to forbid any action.
     /// </param>
     /// <param name="subject">
     /// The subject to forbid (e.g., a resource or entity name like "Post", "User").
-    /// Can be a wildcard using <see cref="PrivilegeSubjects.All"/> to forbid on any subject.
+    /// Can be a wildcard using <see cref="PrivilegeRule.All"/> to forbid on any subject.
     /// </param>
     /// <param name="qualifiers">
     /// An optional collection of qualifiers that further scope the rule (e.g., field names, tags, or regions).
@@ -239,10 +239,10 @@ public class PrivilegeBuilder
     /// <example>
     /// <code>
     /// var builder = new PrivilegeBuilder()
-    ///     .Allow(PrivilegeActions.All, "Post")             // Allow all actions on posts
+    ///     .Allow(PrivilegeRule.All, "Post")             // Allow all actions on posts
     ///     .Forbid("delete", "Post")                        // Except deletion
     ///     .Forbid("edit", "Post", ["sensitive_data"])      // Forbid editing sensitive fields
-    ///     .Forbid(PrivilegeActions.All, "AdminSettings");  // Forbid all actions on admin settings
+    ///     .Forbid(PrivilegeRule.All, "AdminSettings");  // Forbid all actions on admin settings
     /// </code>
     /// </example>
     /// <seealso cref="Allow(string, string, IEnumerable{string}?)"/>
@@ -383,7 +383,7 @@ public class PrivilegeBuilder
     /// <code>
     /// var builder = new PrivilegeBuilder()
     ///     .Allow("read", "Post")
-    ///     .Forbid("delete", PrivilegeSubjects.All);
+    ///     .Forbid("delete", PrivilegeRule.All);
     ///
     /// var context = builder.Build();
     ///

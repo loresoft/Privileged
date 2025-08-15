@@ -16,7 +16,7 @@ namespace Privileged;
 /// <list type="bullet">
 /// <item><description>Rule-based authorization with allow and forbid permissions.</description></item>
 /// <item><description>Alias expansion for actions, subjects, and qualifiers.</description></item>
-/// <item><description>Wildcard matching using <see cref="PrivilegeActions.All"/> and <see cref="PrivilegeSubjects.All"/>.</description></item>
+/// <item><description>Wildcard matching using <see cref="PrivilegeRule.All"/> and <see cref="PrivilegeRule.All"/>.</description></item>
 /// <item><description>Field-level permissions through qualifiers.</description></item>
 /// <item><description>Customizable string comparison for rule matching.</description></item>
 /// </list>
@@ -221,7 +221,7 @@ public class PrivilegeContext
             return true;
 
         // wildcard match optimization
-        if (StringComparer.Equals(rule.Subject, PrivilegeSubjects.All))
+        if (StringComparer.Equals(rule.Subject, PrivilegeRule.All))
             return true;
 
         // Alias match
@@ -235,7 +235,7 @@ public class PrivilegeContext
             return true;
 
         // wildcard match optimization
-        if (StringComparer.Equals(rule.Action, PrivilegeActions.All))
+        if (StringComparer.Equals(rule.Action, PrivilegeRule.All))
             return true;
 
         // Alias match

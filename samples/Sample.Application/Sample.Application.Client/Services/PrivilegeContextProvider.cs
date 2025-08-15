@@ -22,7 +22,7 @@ public class PrivilegeContextProvider : IPrivilegeContextProvider
             .Alias("SensitiveFields", new[] { "Cost", "InternalNotes" }, PrivilegeMatch.Qualifier)
 
             // Global allowances
-            .Allow("read", PrivilegeSubjects.All)                 // read everything
+            .Allow("read", PrivilegeRule.All)                 // read everything
             .Allow("update", "Product", new[] { "Title", "Summary" }) // update selected product fields
             .Allow("create", "Product")
             .Allow("read", "Order")

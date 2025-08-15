@@ -132,8 +132,8 @@ public class PrivilegeView : ComponentBase
     /// <see cref="StringComparer"/> configured in the privilege context.
     /// </para>
     /// <para>
-    /// Actions can be literal values or constants from <see cref="PrivilegeActions"/> if using
-    /// predefined action types. Wildcard actions like <see cref="PrivilegeActions.All"/> are supported
+    /// Actions can be literal values or constants from <see cref="PrivilegeRule"/> if using
+    /// predefined action types. Wildcard actions like <see cref="PrivilegeRule.All"/> are supported
     /// if defined in the privilege rules.
     /// </para>
     /// </remarks>
@@ -161,8 +161,8 @@ public class PrivilegeView : ComponentBase
     /// should be specified for meaningful authorization checks.
     /// </para>
     /// <para>
-    /// Subjects can be literal values or constants from <see cref="PrivilegeSubjects"/> if using
-    /// predefined subject types. Wildcard subjects like <see cref="PrivilegeSubjects.All"/> are supported
+    /// Subjects can be literal values or constants from <see cref="PrivilegeRule"/> if using
+    /// predefined subject types. Wildcard subjects like <see cref="PrivilegeRule.All"/> are supported
     /// if defined in the privilege rules.
     /// </para>
     /// <para>
