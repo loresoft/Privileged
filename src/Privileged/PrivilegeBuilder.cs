@@ -50,9 +50,9 @@ namespace Privileged;
 /// <para>Using wildcard constants for global rules:</para>
 /// <code>
 /// var context = new PrivilegeBuilder()
-///     .Allow("read", PrivilegeRule.All)     // Allow reading any subject
-///     .Allow(PrivilegeRule.All, "Post")      // Allow any action on posts
-///     .Forbid("delete", PrivilegeRule.All)  // Forbid deleting anything
+///     .Allow("read", PrivilegeRule.Any)     // Allow reading any subject
+///     .Allow(PrivilegeRule.Any, "Post")      // Allow any action on posts
+///     .Forbid("delete", PrivilegeRule.Any)  // Forbid deleting anything
 ///     .Build();
 /// </code>
 /// </example>
@@ -180,8 +180,8 @@ public class PrivilegeBuilder
     /// var builder = new PrivilegeBuilder()
     ///     .Allow("read", "Post")                                  // Basic rule
     ///     .Allow("edit", "Post", new[] { "title", "content" })    // Rule with qualifiers
-    ///     .Allow(PrivilegeRule.All, "Comment")                 // Wildcard action
-    ///     .Allow("manage", PrivilegeRule.All);                // Wildcard subject
+    ///     .Allow(PrivilegeRule.Any, "Comment")                 // Wildcard action
+    ///     .Allow("manage", PrivilegeRule.Any);                // Wildcard subject
     /// </code>
     /// </example>
     /// <seealso cref="Forbid(string, string, IEnumerable{string}?)"/>
@@ -239,10 +239,10 @@ public class PrivilegeBuilder
     /// <example>
     /// <code>
     /// var builder = new PrivilegeBuilder()
-    ///     .Allow(PrivilegeRule.All, "Post")             // Allow all actions on posts
+    ///     .Allow(PrivilegeRule.Any, "Post")             // Allow all actions on posts
     ///     .Forbid("delete", "Post")                        // Except deletion
     ///     .Forbid("edit", "Post", ["sensitive_data"])      // Forbid editing sensitive fields
-    ///     .Forbid(PrivilegeRule.All, "AdminSettings");  // Forbid all actions on admin settings
+    ///     .Forbid(PrivilegeRule.Any, "AdminSettings");  // Forbid all actions on admin settings
     /// </code>
     /// </example>
     /// <seealso cref="Allow(string, string, IEnumerable{string}?)"/>
@@ -383,7 +383,7 @@ public class PrivilegeBuilder
     /// <code>
     /// var builder = new PrivilegeBuilder()
     ///     .Allow("read", "Post")
-    ///     .Forbid("delete", PrivilegeRule.All);
+    ///     .Forbid("delete", PrivilegeRule.Any);
     ///
     /// var context = builder.Build();
     ///

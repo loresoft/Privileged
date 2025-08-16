@@ -88,8 +88,8 @@ Use wildcards to allow all actions on a subject or an action on all subjects:
 
 ```csharp
 var context = new PrivilegeBuilder()
-    .Allow("test", PrivilegeRule.All)     // Allow 'test' action on any subject
-    .Allow(PrivilegeRule.All, "Post")     // Allow any action on 'Post'
+    .Allow("test", PrivilegeRule.Any)     // Allow 'test' action on any subject
+    .Allow(PrivilegeRule.Any, "Post")     // Allow any action on 'Post'
     .Forbid("publish", "Post")            // Forbid overrides allow
     .Build();
 
@@ -185,8 +185,8 @@ context.Allowed("read", "Post", "content").Should().BeFalse();
 Rules are evaluated in the order they are defined, with more specific rules taking precedence:
 
 1. **Forbid rules** always take precedence over allow rules when both match
-2. Rules are matched based on exact string comparison (case-insensitive by default)
-3. Wildcard rules (`PrivilegeRule.All`, `PrivilegeRule.All`) match any value
+2. Rules are matched based on exact string comparison
+3. Wildcard rules `PrivilegeRule.Any` match any value
 4. Alias expansion happens during rule matching
 
 ### String Comparison
