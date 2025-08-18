@@ -62,8 +62,8 @@ namespace Privileged;
 /// <seealso cref="PrivilegeRule"/>
 public class PrivilegeBuilder
 {
-    private readonly List<PrivilegeRule> _rules = [];
-    private readonly List<PrivilegeAlias> _aliases = [];
+    private readonly HashSet<PrivilegeRule> _rules = [];
+    private readonly HashSet<PrivilegeAlias> _aliases = [];
     private StringComparer _stringComparer = StringComparer.InvariantCultureIgnoreCase;
 
     /// <summary>
@@ -92,8 +92,8 @@ public class PrivilegeBuilder
     {
         ArgumentNullException.ThrowIfNull(rules);
 
-        _rules = rules.ToList();
-        _aliases = aliases?.ToList() ?? [];
+        _rules = [.. rules];
+        _aliases = aliases != null ? [.. aliases] : [];
         _stringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
     }
 
@@ -112,8 +112,8 @@ public class PrivilegeBuilder
     {
         ArgumentNullException.ThrowIfNull(model);
 
-        _rules = model.Rules.ToList();
-        _aliases = model.Aliases.ToList();
+        _rules = [.. model.Rules];
+        _aliases = [.. model.Aliases];
         _stringComparer = stringComparer ?? StringComparer.InvariantCultureIgnoreCase;
     }
 
@@ -398,7 +398,7 @@ public class PrivilegeBuilder
     /// <seealso cref="Alias(string, IEnumerable{string}, PrivilegeMatch)"/>
     public PrivilegeContext Build()
     {
-        return new PrivilegeContext(_rules, _aliases, _stringComparer);
+        return new PrivilegeContext([.. _rules], [.. _aliases], _stringComparer);
     }
 
 }
