@@ -29,21 +29,20 @@ namespace Privileged.Components;
 /// <item><description>Busy: When <see cref="Busy"/> is <c>true</c> or the <see cref="Trigger"/> callback is executing.</description></item>
 /// <item><description>Normal: When the user has permission and the button is not disabled or busy.</description></item>
 /// </list>
-/// </para>
 /// </remarks>
 /// <example>
 /// <code>
 /// &lt;!-- Basic usage with privilege check --&gt;
-/// &lt;PrivilegeButton Action="delete" 
-///                 Subject="Document" 
+/// &lt;PrivilegeButton Action="delete"
+///                 Subject="Document"
 ///                 Trigger="DeleteDocument"
 ///                 class="btn btn-danger"&gt;
 ///     Delete Document
 /// &lt;/PrivilegeButton&gt;
-/// 
+///
 /// &lt;!-- With custom busy template and qualifier --&gt;
-/// &lt;PrivilegeButton Action="update" 
-///                 Subject="User" 
+/// &lt;PrivilegeButton Action="update"
+///                 Subject="User"
 ///                 Qualifier="Salary"
 ///                 Trigger="UpdateSalary"
 ///                 BusyText="Updating salary..."&gt;
@@ -52,10 +51,10 @@ namespace Privileged.Components;
 ///     &lt;/BusyTemplate&gt;
 ///     Update Salary
 /// &lt;/PrivilegeButton&gt;
-/// 
+///
 /// &lt;!-- Hidden when forbidden --&gt;
-/// &lt;PrivilegeButton Action="admin" 
-///                 Subject="System" 
+/// &lt;PrivilegeButton Action="admin"
+///                 Subject="System"
 ///                 HideForbidden="true"
 ///                 Trigger="AdminAction"&gt;
 ///     Admin Panel
@@ -285,8 +284,8 @@ public class PrivilegeButton : ComponentBase
     /// </remarks>
     /// <example>
     /// <code>
-    /// &lt;PrivilegeButton Action="delete" 
-    ///                 Subject="Document" 
+    /// &lt;PrivilegeButton Action="delete"
+    ///                 Subject="Document"
     ///                 class="btn btn-danger"
     ///                 title="Delete this document"
     ///                 data-toggle="tooltip"&gt;
@@ -322,12 +321,12 @@ public class PrivilegeButton : ComponentBase
     /// </remarks>
     /// <example>
     /// <code>
-    /// &lt;PrivilegeButton Action="save" 
-    ///                 Subject="Document" 
+    /// &lt;PrivilegeButton Action="save"
+    ///                 Subject="Document"
     ///                 Trigger="SaveDocumentAsync"&gt;
     ///     Save
     /// &lt;/PrivilegeButton&gt;
-    /// 
+    ///
     /// @code {
     ///     private async Task SaveDocumentAsync()
     ///     {
