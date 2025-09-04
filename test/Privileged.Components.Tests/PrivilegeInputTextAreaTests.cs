@@ -97,12 +97,11 @@ public class PrivilegeInputTextAreaTests : TestContext
     public void NullSubject_AssumeAllPrivileges_RendersNormalTextArea()
     {
         var model = new TestModel { Description = "Desc" };
-        var editContext = new EditContext(model);
+
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
         var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
-            .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)
             .Add(p => p.ValueExpression, () => model.Description)

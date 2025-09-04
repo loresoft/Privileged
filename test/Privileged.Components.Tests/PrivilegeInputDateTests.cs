@@ -107,12 +107,11 @@ public class PrivilegeInputDateTests : TestContext
     public void NullSubject_AssumeAllPrivileges_RendersEditableInput()
     {
         var model = new TestModel { DateOfBirth = new DateTime(1990, 5, 15) };
-        var editContext = new EditContext(model);
+
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
         var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
-            .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
             .Add(p => p.ValueExpression, () => model.DateOfBirth)

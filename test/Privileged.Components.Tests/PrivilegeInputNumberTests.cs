@@ -104,12 +104,10 @@ public class PrivilegeInputNumberTests : TestContext
     public void NullSubject_AssumeAllPrivileges_RendersNormalNumberInput()
     {
         var model = new TestModel { Age = 42 };
-        var editContext = new EditContext(model);
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
         var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
-            .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
             .Add(p => p.ValueExpression, () => model.Age)

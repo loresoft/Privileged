@@ -78,12 +78,11 @@ public class PrivilegeInputCheckboxTests : TestContext
     public void NullSubject_AssumeAllPrivileges_RendersEnabledCheckbox()
     {
         var model = new TestModel { IsActive = true };
-        var editContext = new EditContext(model);
+
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
         var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
-            .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
             .Add(p => p.ValueExpression, () => model.IsActive)

@@ -743,6 +743,53 @@ These components automatically:
 - Enable/disable based on update permissions
 - Show/hide based on read permissions
 
+#### PrivilegeForm Component
+
+The `PrivilegeForm` component extends the standard `EditForm` to provide privilege-aware form functionality. It automatically cascades privilege form state to child components, allowing you to set default privilege settings at the form level while maintaining the ability for individual components to override specific values.
+
+```razor
+@* Basic form with default privilege settings *@
+<PrivilegeForm Model="@postModel" Subject="Post" ReadAction="read" UpdateAction="update">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    
+    @* These inputs inherit the Subject, ReadAction, and UpdateAction from the form *@
+    <PrivilegeInputText @bind-Value="@postModel.Title" Field="title" />
+    <PrivilegeInputTextArea @bind-Value="@postModel.Content" Field="content" />
+    <PrivilegeInputSelect @bind-Value="@postModel.Status" Field="status">
+        <option value="draft">Draft</option>
+        <option value="published">Published</option>
+    </PrivilegeInputSelect>
+    
+    @* This input overrides the default Subject *@
+    <PrivilegeInputText @bind-Value="@postModel.AuthorEmail" 
+                        Subject="User" 
+                        Field="email" />
+    
+    <button type="submit" class="btn btn-primary">Save Post</button>
+</PrivilegeForm>
+
+@* Form with different actions for different operations *@
+<PrivilegeForm Model="@userModel" Subject="User" ReadAction="view" UpdateAction="edit">
+    <PrivilegeInputText @bind-Value="@userModel.FirstName" Field="firstName" />
+    <PrivilegeInputText @bind-Value="@userModel.LastName" Field="lastName" />
+    
+    @* Admin-only field with different permissions *@
+    <PrivilegeInputText @bind-Value="@userModel.Role" 
+                        Subject="User" 
+                        Field="role"
+                        ReadAction="viewRole"
+                        UpdateAction="editRole" />
+</PrivilegeForm>
+```
+
+Key benefits of `PrivilegeForm`:
+
+- **Cascading Defaults**: Set privilege parameters once at the form level instead of repeating them on every input
+- **Flexible Overrides**: Individual components can override any of the cascaded values when needed
+- **Standard EditForm**: Maintains all functionality of the base `EditForm` component including validation
+- **Clean Markup**: Reduces repetitive code and makes forms easier to maintain
+
 ### PrivilegeInputText HTML Output Example
 
 Below is an example of the `PrivilegeInputText` component and its corresponding HTML output for various states based on the `PrivilegeContext` results:

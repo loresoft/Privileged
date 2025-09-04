@@ -133,12 +133,11 @@ public class PrivilegeInputSelectTests : TestContext
     public void NullSubject_AssumeAllPrivileges_RendersNormalSelect()
     {
         var model = new TestModel { Option = "B" };
-        var editContext = new EditContext(model);
+
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
         var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
-            .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)
             .Add(p => p.ValueExpression, () => model.Option)

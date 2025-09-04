@@ -183,12 +183,11 @@ public class PrivilegeInputTextTests : TestContext
     public void NullSubject_AssumeAllPrivileges_RendersNormalTextInput()
     {
         var model = new TestModel { Name = "Test" };
-        var editContext = new EditContext(model);
+
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
         var cut = RenderComponent<PrivilegeInputText>(ps => ps
-            .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
             .Add(p => p.ValueExpression, () => model.Name)
