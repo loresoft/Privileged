@@ -11,12 +11,12 @@
     <PackageVersion Include="bunit" Version="1.40.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="Equatable.Generator" Version="2.0.0" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.9" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.9" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="9.0.10" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="9.0.10" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageVersion Include="MinVer" Version="6.0.0" />
     <PackageVersion Include="xunit" Version="2.9.3" />
