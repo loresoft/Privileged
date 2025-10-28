@@ -232,19 +232,39 @@ public class PrivilegeLinkTests : TestContext
     }
 
     [Fact]
-    public void ThrowsExceptionWhenNoPrivilegeContext()
+    public void NoPrivilegeContext_AssumeAllPrivileges_RendersLink()
     {
-        // Act & Assert
-        var exception = Assert.Throws<InvalidOperationException>(() =>
-            RenderComponent<PrivilegeLink>(parameters => parameters
-                .Add(p => p.Subject, "Post")
-                .Add(p => p.Action, "read")
-                .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
-                .Add(p => p.ChildContent, builder => builder.AddContent(0, "View Posts"))
-            )
+        // When no PrivilegeContext is provided, component should assume all privileges
+        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+            .Add(p => p.Subject, "Post")
+            .Add(p => p.Action, "read")
+            .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "View Posts"))
         );
 
-        exception.Message.Should().Be("Component requires a cascading parameter of type PrivilegeContext.");
+        // Assert
+        cut.Find("a").Should().NotBeNull();
+        cut.Find("a").GetAttribute("href").Should().Be("/posts");
+        cut.Find("a").TextContent.Should().Be("View Posts");
+    }
+
+    [Fact]
+    public void NoPrivilegeContext_WithHideForbidden_DoesNotHide()
+    {
+        // When no PrivilegeContext is provided, all privileges are assumed, so link should not hide
+        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+            .Add(p => p.Subject, "Post")
+            .Add(p => p.Action, "read")
+            .Add(p => p.HideForbidden, true)
+            .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "View Posts"))
+        );
+
+        // Assert
+        cut.Find("a").Should().NotBeNull();
+        cut.Find("a").GetAttribute("href").Should().Be("/posts");
+        cut.Find("a").TextContent.Should().Be("View Posts");
+        cut.FindAll("span").Should().BeEmpty();
     }
 
     [Fact]

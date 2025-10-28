@@ -221,24 +221,33 @@ public class PrivilegeInputSelectTests : TestContext
     }
 
     [Fact]
-    public void Throws_When_No_PrivilegeContext_Provided()
+    public void NoPrivilegeContext_AssumeAllPrivileges_RendersNormalSelect()
     {
+        // When no PrivilegeContext is provided, component should assume all privileges
         var model = new TestModel { Option = "B" };
         var editContext = new EditContext(model);
 
-        var exception = Assert.Throws<System.InvalidOperationException>(() =>
-        {
-            RenderComponent<PrivilegeInputSelect<string>>(ps => ps
-                .AddCascadingValue(editContext)
-                .Add(p => p.Value, model.Option)
-                .Add(p => p.ValueExpression, () => model.Option)
-                .Add(p => p.ValueChanged, EventCallback.Factory.Create<string>(this, v => model.Option = v))
-                .Add(p => p.Subject, nameof(TestModel))
-                .Add(p => p.Field, nameof(TestModel.Option))
-            );
-        });
+        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+            .AddCascadingValue(editContext)
+            .Add(p => p.Value, model.Option)
+            .Add(p => p.ValueExpression, () => model.Option)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string>(this, v => model.Option = v))
+            .Add(p => p.Subject, nameof(TestModel))
+            .Add(p => p.Field, nameof(TestModel.Option))
+            .Add(p => p.ChildContent, (RenderFragment)(builder =>
+            {
+                builder.OpenElement(0, "option");
+                builder.AddAttribute(1, "value", "A");
+                builder.AddContent(2, "Option A");
+                builder.CloseElement();
+                builder.OpenElement(3, "option");
+                builder.AddAttribute(4, "value", "B");
+                builder.AddContent(5, "Option B");
+                builder.CloseElement();
+            }))
+        );
 
-        exception.Message.Should().Contain("PrivilegeContext");
+        cut.Find("select").HasAttribute("disabled").Should().BeFalse();
     }
 
     [Fact]

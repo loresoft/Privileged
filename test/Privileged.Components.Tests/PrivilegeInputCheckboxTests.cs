@@ -140,24 +140,23 @@ public class PrivilegeInputCheckboxTests : TestContext
     }
 
     [Fact]
-    public void Throws_When_No_PrivilegeContext_Provided()
+    public void NoPrivilegeContext_AssumeAllPrivileges_RendersEnabledCheckbox()
     {
+        // When no PrivilegeContext is provided, component should assume all privileges
         var model = new TestModel { IsActive = true };
         var editContext = new EditContext(model);
 
-        var exception = Assert.Throws<System.InvalidOperationException>(() =>
-        {
-            RenderComponent<PrivilegeInputCheckbox>(ps => ps
-                .AddCascadingValue(editContext)
-                .Add(p => p.Value, model.IsActive)
-                .Add(p => p.ValueExpression, () => model.IsActive)
-                .Add(p => p.ValueChanged, EventCallback.Factory.Create<bool>(this, v => model.IsActive = v))
-                .Add(p => p.Subject, nameof(TestModel))
-                .Add(p => p.Field, nameof(TestModel.IsActive))
-            );
-        });
+        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+            .AddCascadingValue(editContext)
+            .Add(p => p.Value, model.IsActive)
+            .Add(p => p.ValueExpression, () => model.IsActive)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<bool>(this, v => model.IsActive = v))
+            .Add(p => p.Subject, nameof(TestModel))
+            .Add(p => p.Field, nameof(TestModel.IsActive))
+        );
 
-        exception.Message.Should().Contain("PrivilegeContext");
+        var input = cut.Find("input[type=checkbox]");
+        input.HasAttribute("disabled").Should().BeFalse();
     }
 
     [Fact]

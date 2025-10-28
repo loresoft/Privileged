@@ -204,14 +204,15 @@ public class PrivilegeInputDateTests : TestContext
     }
 
     [Fact]
-    public void ThrowsException_WhenPrivilegeContextMissing()
+    public void NoPrivilegeContext_AssumeAllPrivileges_RendersEditableInput()
     {
+        // When no PrivilegeContext is provided, component should assume all privileges
         var model = new TestModel { DateOfBirth = new DateTime(1990, 5, 15) };
         var editContext = new EditContext(model);
 
-        var act = () => RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
-            // Missing PrivilegeContext
+            // No PrivilegeContext provided
             .Add(p => p.Value, model.DateOfBirth)
             .Add(p => p.ValueExpression, () => model.DateOfBirth)
             .Add(p => p.ValueChanged, EventCallback.Factory.Create<DateTime>(this, v => model.DateOfBirth = v))
@@ -219,8 +220,10 @@ public class PrivilegeInputDateTests : TestContext
             .Add(p => p.Field, nameof(TestModel.DateOfBirth))
         );
 
-        act.Should().Throw<InvalidOperationException>()
-            .WithMessage("Component requires a cascading parameter of type PrivilegeContext.");
+        var input = cut.Find("input");
+        input.GetAttribute("type").Should().Be("date");
+        input.HasAttribute("readonly").Should().BeFalse();
+        input.HasAttribute("disabled").Should().BeFalse();
     }
 
     [Fact]

@@ -171,24 +171,25 @@ public class PrivilegeInputNumberTests : TestContext
     }
 
     [Fact]
-    public void Throws_When_No_PrivilegeContext_Provided()
+    public void NoPrivilegeContext_AssumeAllPrivileges_RendersNormalNumberInput()
     {
+        // When no PrivilegeContext is provided, component should assume all privileges
         var model = new TestModel { Age = 42 };
         var editContext = new EditContext(model);
 
-        var exception = Assert.Throws<System.InvalidOperationException>(() =>
-        {
-            RenderComponent<PrivilegeInputNumber<int>>(ps => ps
-                .AddCascadingValue(editContext)
-                .Add(p => p.Value, model.Age)
-                .Add(p => p.ValueExpression, () => model.Age)
-                .Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => model.Age = v))
-                .Add(p => p.Subject, nameof(TestModel))
-                .Add(p => p.Field, nameof(TestModel.Age))
-            );
-        });
+        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+            .AddCascadingValue(editContext)
+            .Add(p => p.Value, model.Age)
+            .Add(p => p.ValueExpression, () => model.Age)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<int>(this, v => model.Age = v))
+            .Add(p => p.Subject, nameof(TestModel))
+            .Add(p => p.Field, nameof(TestModel.Age))
+  );
 
-        exception.Message.Should().Contain("PrivilegeContext");
+   var input = cut.Find("input");
+  input.GetAttribute("type").Should().Be("number");
+   input.HasAttribute("readonly").Should().BeFalse();
+input.HasAttribute("disabled").Should().BeFalse();
     }
 
     [Fact]

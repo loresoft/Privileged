@@ -159,24 +159,23 @@ public class PrivilegeInputTextAreaTests : TestContext
     }
 
     [Fact]
-    public void Throws_When_No_PrivilegeContext_Provided()
+    public void NoPrivilegeContext_AssumeAllPrivileges_RendersNormalTextArea()
     {
+        // When no PrivilegeContext is provided, component should assume all privileges
         var model = new TestModel { Description = "Desc" };
         var editContext = new EditContext(model);
 
-        var exception = Assert.Throws<System.InvalidOperationException>(() =>
-        {
-            RenderComponent<PrivilegeInputTextArea>(ps => ps
-                .AddCascadingValue(editContext)
-                .Add(p => p.Value, model.Description)
-                .Add(p => p.ValueExpression, () => model.Description)
-                .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Description = v!))
-                .Add(p => p.Subject, nameof(TestModel))
-                .Add(p => p.Field, nameof(TestModel.Description))
-            );
-        });
+        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+            .AddCascadingValue(editContext)
+            .Add(p => p.Value, model.Description)
+            .Add(p => p.ValueExpression, () => model.Description)
+            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Description = v!))
+            .Add(p => p.Subject, nameof(TestModel))
+            .Add(p => p.Field, nameof(TestModel.Description))
+        );
 
-        exception.Message.Should().Contain("PrivilegeContext");
+        cut.Find("textarea").HasAttribute("readonly").Should().BeFalse();
+        cut.Find("textarea").HasAttribute("disabled").Should().BeFalse();
     }
 
     [Fact]

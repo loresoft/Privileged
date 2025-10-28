@@ -402,18 +402,36 @@ public class PrivilegeButtonTests : TestContext
     }
 
     [Fact]
-    public void Throws_When_No_PrivilegeContext_Provided()
+    public void NoPrivilegeContext_AssumeAllPrivileges_RendersEnabledButton()
     {
-        var exception = Assert.Throws<InvalidOperationException>(() =>
-        {
-            RenderComponent<PrivilegeButton>(ps => ps
-                .Add(p => p.Action, "create")
-                .Add(p => p.Subject, "Post")
-                .Add(p => p.ChildContent, builder => builder.AddContent(0, "Create Post"))
-            );
-        });
+        // When no PrivilegeContext is provided, component should assume all privileges
+        var cut = RenderComponent<PrivilegeButton>(ps => ps
+            .Add(p => p.Action, "create")
+            .Add(p => p.Subject, "Post")
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "Create Post"))
+        );
 
-        exception.Message.Should().Contain("PrivilegeContext");
+        var button = cut.Find("button");
+        button.Should().NotBeNull();
+        button.HasAttribute("disabled").Should().BeFalse();
+        button.TextContent.Should().Be("Create Post");
+    }
+
+    [Fact]
+    public void NoPrivilegeContext_WithHideForbidden_DoesNotHide()
+    {
+        // When no PrivilegeContext is provided, all privileges are assumed, so button should not hide
+        var cut = RenderComponent<PrivilegeButton>(ps => ps
+            .Add(p => p.Action, "create")
+            .Add(p => p.Subject, "Post")
+            .Add(p => p.HideForbidden, true)
+            .Add(p => p.ChildContent, builder => builder.AddContent(0, "Create Post"))
+        );
+
+        var button = cut.Find("button");
+        button.Should().NotBeNull();
+        button.HasAttribute("disabled").Should().BeFalse();
+        button.TextContent.Should().Be("Create Post");
     }
 
     [Fact]

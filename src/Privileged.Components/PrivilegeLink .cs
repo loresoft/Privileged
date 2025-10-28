@@ -262,16 +262,16 @@ public class PrivilegeLink : NavLink
     {
         base.OnParametersSet();
 
-        if (PrivilegeContext == null)
-            throw new InvalidOperationException("Component requires a cascading parameter of type PrivilegeContext.");
-
         if (Subjects?.Any() == true)
         {
-            HasPermission = PrivilegeContext.Any(Action, Subjects);
+            HasPermission = PrivilegeContext == null
+                || PrivilegeContext.Any(Action, Subjects);
+
             return;
         }
 
-        HasPermission = string.IsNullOrWhiteSpace(Subject)
+        HasPermission = PrivilegeContext == null
+            || string.IsNullOrWhiteSpace(Subject)
             || PrivilegeContext.Allowed(Action, Subject, Qualifier);
     }
 

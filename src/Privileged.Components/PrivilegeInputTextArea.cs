@@ -181,19 +181,18 @@ public class PrivilegeInputTextArea : InputTextArea
     {
         base.OnParametersSet();
 
-        if (PrivilegeContext == null)
-            throw new InvalidOperationException($"Component requires a cascading parameter of type {nameof(PrivilegeContext)}.");
-
         var subject = Subject ?? PrivilegeFormState?.Subject ?? EditContext?.Model.GetType().Name;
         var qualifier = Field ?? NameAttributeValue;
         var readAction = ReadAction ?? PrivilegeFormState?.ReadAction ?? "read";
         var updateAction = UpdateAction ?? PrivilegeFormState?.UpdateAction ?? "update";
 
 
-        HasReadPermission = string.IsNullOrWhiteSpace(subject)
+        HasReadPermission = PrivilegeContext == null
+            || string.IsNullOrWhiteSpace(subject)
             || PrivilegeContext.Allowed(readAction, subject, qualifier);
 
-        HasUpdatePermission = string.IsNullOrWhiteSpace(subject)
+        HasUpdatePermission = PrivilegeContext == null
+            || string.IsNullOrWhiteSpace(subject)
             || PrivilegeContext.Allowed(updateAction, subject, qualifier);
 
         if (HasUpdatePermission)

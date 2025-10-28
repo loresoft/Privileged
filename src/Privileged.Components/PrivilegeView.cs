@@ -337,14 +337,10 @@ public class PrivilegeView : ComponentBase
         base.OnParametersSet();
 
         if (ChildContent != null && Allowed != null)
-        {
             throw new InvalidOperationException($"Do not specify both '{nameof(Allowed)}' and '{nameof(ChildContent)}'.");
-        }
 
         if (PrivilegeContext == null)
-        {
             throw new InvalidOperationException("PrivilegedView requires a cascading parameter of type PrivilegeContext.");
-        }
 
         if (Subjects?.Any() == true)
         {

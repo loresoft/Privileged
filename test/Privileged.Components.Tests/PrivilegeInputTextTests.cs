@@ -110,49 +110,51 @@ public class PrivilegeInputTextTests : TestContext
         var model = new TestModel { Name = "John" };
         var editContext = new EditContext(model);
         var ctx = new PrivilegeBuilder()
-            .Allow("read", nameof(TestModel))
-            .Allow("update", nameof(TestModel))
-            .Build();
+    .Allow("read", nameof(TestModel))
+    .Allow("update", nameof(TestModel))
+    .Build();
 
         var cut = RenderComponent<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
-            .AddCascadingValue(ctx)
-            .Add(p => p.Value, model.Name)
-            .Add(p => p.ValueExpression, () => model.Name)
-            .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
+    .AddCascadingValue(ctx)
+       .Add(p => p.Value, model.Name)
+        .Add(p => p.ValueExpression, () => model.Name)
+        .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
         // Intentionally not setting Subject and Field - should fallback to model name and name attribute
         );
 
-        var input = cut.Find("input");
-        // For text inputs, the type attribute may not be explicitly set since "text" is the default
-        var type = input.GetAttribute("type") ?? "text";
+   var input = cut.Find("input");
+      // For text inputs, the type attribute may not be explicitly set since "text" is the default
+ var type = input.GetAttribute("type") ?? "text";
         type.Should().Be("text");
         input.HasAttribute("readonly").Should().BeFalse();
 
-        // Verify the input has a name attribute (which would be used as the field fallback)
+  // Verify the input has a name attribute (which would be used as the field fallback)
         input.HasAttribute("name").Should().BeTrue();
     }
 
     [Fact]
-    public void Throws_When_No_PrivilegeContext_Provided()
-    {
-        var model = new TestModel { Name = "John" };
-        var editContext = new EditContext(model);
+    public void NoPrivilegeContext_AssumeAllPrivileges_RendersNormalTextInput()
+{
+        // When no PrivilegeContext is provided, component should assume all privileges
+   var model = new TestModel { Name = "Test" };
+   var editContext = new EditContext(model);
 
-        var exception = Assert.Throws<System.InvalidOperationException>(() =>
-        {
-            RenderComponent<PrivilegeInputText>(ps => ps
-                .AddCascadingValue(editContext)
-                .Add(p => p.Value, model.Name)
-                .Add(p => p.ValueExpression, () => model.Name)
-                .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
-                .Add(p => p.Subject, nameof(TestModel))
-                .Add(p => p.Field, nameof(TestModel.Name))
-            );
-        });
+        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+      .AddCascadingValue(editContext)
+            .Add(p => p.Value, model.Name)
+      .Add(p => p.ValueExpression, () => model.Name)
+     .Add(p => p.ValueChanged, EventCallback.Factory.Create<string?>(this, v => model.Name = v!))
+      .Add(p => p.Subject, nameof(TestModel))
+     .Add(p => p.Field, nameof(TestModel.Name))
+        );
 
-        exception.Message.Should().Contain("PrivilegeContext");
-    }
+        var input = cut.Find("input");
+        var type = input.GetAttribute("type") ?? "text";
+        type.Should().Be("text");
+      input.HasAttribute("readonly").Should().BeFalse();
+  input.HasAttribute("disabled").Should().BeFalse();
+}
 
     [Fact]
     public void EmptySubject_AssumeAllPrivileges_RendersNormalTextInput()

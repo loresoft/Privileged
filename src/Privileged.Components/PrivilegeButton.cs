@@ -502,12 +502,10 @@ public class PrivilegeButton : ComponentBase
     {
         base.OnParametersSet();
 
-        if (PrivilegeContext == null)
-            throw new InvalidOperationException("Component requires a cascading parameter of type PrivilegeContext.");
-
         BusyTemplate ??= builder => builder.AddContent(0, BusyText);
 
-        HasPermission = string.IsNullOrWhiteSpace(Action)
+        HasPermission = PrivilegeContext == null
+            || string.IsNullOrWhiteSpace(Action)
             || string.IsNullOrWhiteSpace(Subject)
             || PrivilegeContext.Allowed(Action, Subject, Qualifier);
     }
