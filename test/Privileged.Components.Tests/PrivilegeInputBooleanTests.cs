@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeInputBooleanTests : TestContext
+public class PrivilegeInputBooleanTests : BunitContext
 {
     [Fact]
     public void Renders_Boolean_Select_When_Read_And_Update_Allowed()
@@ -20,7 +15,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.IsActive)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -51,7 +46,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.IsOptional)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool?>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool?>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsOptional)
@@ -83,7 +78,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("read", nameof(TestModel), [nameof(TestModel.IsActive)])
             .Build(); // no update rule
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -106,7 +101,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("read", nameof(TestModel), [nameof(TestModel.IsOptional)])
             .Build(); // no update rule
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool?>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool?>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsOptional)
@@ -127,7 +122,7 @@ public class PrivilegeInputBooleanTests : TestContext
         var editContext = new EditContext(model);
         var ctx = new PrivilegeBuilder().Build(); // no permissions
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -149,7 +144,7 @@ public class PrivilegeInputBooleanTests : TestContext
         var editContext = new EditContext(model);
         var ctx = new PrivilegeBuilder().Build(); // no permissions
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool?>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool?>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsOptional)
@@ -174,7 +169,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.IsActive)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -204,7 +199,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.IsOptional)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool?>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool?>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsOptional)
@@ -238,7 +233,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Build();
 
         // This should throw because string is not bool or bool?
-        Action action = () => RenderComponent<PrivilegeInputBoolean<string>>(ps => ps
+        Action action = () => Render<PrivilegeInputBoolean<string>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -262,7 +257,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.IsActive)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, true)
@@ -286,7 +281,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("update", nameof(TestModel))
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -311,7 +306,7 @@ public class PrivilegeInputBooleanTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.IsActive)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputBoolean<bool>>(ps => ps
+        var cut = Render<PrivilegeInputBoolean<bool>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)

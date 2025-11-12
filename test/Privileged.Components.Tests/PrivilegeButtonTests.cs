@@ -1,11 +1,8 @@
-using System;
-using System.Threading.Tasks;
-
 using Microsoft.AspNetCore.Components;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeButtonTests : TestContext
+public class PrivilegeButtonTests : BunitContext
 {
     [Fact]
     public void Renders_Button_When_Permission_Allowed()
@@ -14,7 +11,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -33,7 +30,7 @@ public class PrivilegeButtonTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // no permissions
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -50,7 +47,7 @@ public class PrivilegeButtonTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // no permissions
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -67,7 +64,7 @@ public class PrivilegeButtonTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "") // Empty subject - should assume all privileges
@@ -86,7 +83,7 @@ public class PrivilegeButtonTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, (string?)null) // Null subject - should assume all privileges
@@ -105,7 +102,7 @@ public class PrivilegeButtonTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "   ") // Whitespace subject - should assume all privileges
@@ -124,7 +121,7 @@ public class PrivilegeButtonTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "") // Empty subject
@@ -144,7 +141,7 @@ public class PrivilegeButtonTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "") // Empty subject - should assume all privileges
@@ -165,7 +162,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -184,7 +181,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -203,7 +200,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -222,7 +219,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -242,7 +239,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -264,7 +261,7 @@ public class PrivilegeButtonTests : TestContext
 
         var callback = EventCallback.Factory.Create(this, () => { });
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -286,7 +283,7 @@ public class PrivilegeButtonTests : TestContext
         var triggered = false;
         var callback = EventCallback.Factory.Create(this, () => triggered = true);
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -310,7 +307,7 @@ public class PrivilegeButtonTests : TestContext
         var tcs = new TaskCompletionSource();
         var callback = EventCallback.Factory.Create(this, () => tcs.Task);
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -349,7 +346,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("update", "Post", ["title"])
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "Post")
@@ -368,7 +365,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("update", "Post", ["title"])
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "Post")
@@ -387,7 +384,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -405,7 +402,7 @@ public class PrivilegeButtonTests : TestContext
     public void NoPrivilegeContext_AssumeAllPrivileges_RendersEnabledButton()
     {
         // When no PrivilegeContext is provided, component should assume all privileges
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
             .Add(p => p.ChildContent, builder => builder.AddContent(0, "Create Post"))
@@ -421,7 +418,7 @@ public class PrivilegeButtonTests : TestContext
     public void NoPrivilegeContext_WithHideForbidden_DoesNotHide()
     {
         // When no PrivilegeContext is provided, all privileges are assumed, so button should not hide
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
             .Add(p => p.HideForbidden, true)
@@ -441,7 +438,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -458,7 +455,7 @@ public class PrivilegeButtonTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // no permissions
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -482,7 +479,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -506,7 +503,7 @@ public class PrivilegeButtonTests : TestContext
 
         var callback = EventCallback.Factory.Create(this, () => throw new InvalidOperationException("Test exception"));
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")
@@ -538,7 +535,7 @@ public class PrivilegeButtonTests : TestContext
             .Allow("create", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeButton>(ps => ps
+        var cut = Render<PrivilegeButton>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Action, "create")
             .Add(p => p.Subject, "Post")

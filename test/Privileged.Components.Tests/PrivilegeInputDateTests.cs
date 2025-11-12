@@ -1,14 +1,9 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeInputDateTests : TestContext
+public class PrivilegeInputDateTests : BunitContext
 {
     [Fact]
     public void Renders_Date_Input_When_Read_And_Update_Allowed()
@@ -20,7 +15,7 @@ public class PrivilegeInputDateTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.DateOfBirth)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
@@ -44,7 +39,7 @@ public class PrivilegeInputDateTests : TestContext
             .Allow("read", nameof(TestModel), [nameof(TestModel.DateOfBirth)])
             .Build(); // no update rule
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
@@ -66,7 +61,7 @@ public class PrivilegeInputDateTests : TestContext
         var editContext = new EditContext(model);
         var ctx = new PrivilegeBuilder().Build(); // No permissions
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
@@ -88,7 +83,7 @@ public class PrivilegeInputDateTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
@@ -111,7 +106,7 @@ public class PrivilegeInputDateTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
             .Add(p => p.ValueExpression, () => model.DateOfBirth)
@@ -135,7 +130,7 @@ public class PrivilegeInputDateTests : TestContext
             .Allow("edit", nameof(TestModel), [nameof(TestModel.DateOfBirth)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
@@ -161,7 +156,7 @@ public class PrivilegeInputDateTests : TestContext
             .Allow("edit", nameof(TestModel), [nameof(TestModel.DateOfBirth)])
             .Build(); // view action not allowed
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
@@ -186,7 +181,7 @@ public class PrivilegeInputDateTests : TestContext
             .Allow("view", nameof(TestModel), [nameof(TestModel.DateOfBirth)])
             .Build(); // edit action not allowed
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)
@@ -210,7 +205,7 @@ public class PrivilegeInputDateTests : TestContext
         var model = new TestModel { DateOfBirth = new DateTime(1990, 5, 15) };
         var editContext = new EditContext(model);
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             // No PrivilegeContext provided
             .Add(p => p.Value, model.DateOfBirth)
@@ -237,7 +232,7 @@ public class PrivilegeInputDateTests : TestContext
             .Allow("update", model.GetType().Name, [nameof(model.DateOfBirth)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputDate<DateOnly>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateOnly>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, dateOnlyValue)
@@ -263,7 +258,7 @@ public class PrivilegeInputDateTests : TestContext
             .Allow("update", model.GetType().Name, [nameof(model.DateOfBirth)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime?>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime?>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, nullableDate)
@@ -294,7 +289,7 @@ public class PrivilegeInputDateTests : TestContext
             ["placeholder"] = "Select a date"
         };
 
-        var cut = RenderComponent<PrivilegeInputDate<DateTime>>(ps => ps
+        var cut = Render<PrivilegeInputDate<DateTime>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.DateOfBirth)

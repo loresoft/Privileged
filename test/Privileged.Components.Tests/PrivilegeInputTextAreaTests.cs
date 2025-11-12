@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeInputTextAreaTests : TestContext
+public class PrivilegeInputTextAreaTests : BunitContext
 {
     [Fact]
     public void Renders_TextArea_When_Read_And_Update_Allowed()
@@ -15,7 +15,7 @@ public class PrivilegeInputTextAreaTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.Description)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)
@@ -37,7 +37,7 @@ public class PrivilegeInputTextAreaTests : TestContext
             .Allow("read", nameof(TestModel), [nameof(TestModel.Description)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)
@@ -57,7 +57,7 @@ public class PrivilegeInputTextAreaTests : TestContext
         var editContext = new EditContext(model);
         var ctx = new PrivilegeBuilder().Build();
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)
@@ -79,7 +79,7 @@ public class PrivilegeInputTextAreaTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)
@@ -101,7 +101,7 @@ public class PrivilegeInputTextAreaTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)
             .Add(p => p.ValueExpression, () => model.Description)
@@ -122,7 +122,7 @@ public class PrivilegeInputTextAreaTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)
@@ -144,7 +144,7 @@ public class PrivilegeInputTextAreaTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)
@@ -165,7 +165,7 @@ public class PrivilegeInputTextAreaTests : TestContext
         var model = new TestModel { Description = "Desc" };
         var editContext = new EditContext(model);
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(editContext)
             .Add(p => p.Value, model.Description)
             .Add(p => p.ValueExpression, () => model.Description)
@@ -186,7 +186,7 @@ public class PrivilegeInputTextAreaTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputTextArea>(ps => ps
+        var cut = Render<PrivilegeInputTextArea>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Description)

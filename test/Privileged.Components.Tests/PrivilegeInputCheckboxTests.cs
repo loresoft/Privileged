@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeInputCheckboxTests : TestContext
+public class PrivilegeInputCheckboxTests : BunitContext
 {
     [Fact]
     public void Renders_Checkbox_When_Read_And_Update_Allowed()
@@ -15,7 +15,7 @@ public class PrivilegeInputCheckboxTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.IsActive)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var cut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -38,7 +38,7 @@ public class PrivilegeInputCheckboxTests : TestContext
             .Allow("read", nameof(TestModel), [nameof(TestModel.IsActive)])
             .Build(); // no update rule
 
-        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var cut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -60,7 +60,7 @@ public class PrivilegeInputCheckboxTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var cut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -82,7 +82,7 @@ public class PrivilegeInputCheckboxTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var cut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
             .Add(p => p.ValueExpression, () => model.IsActive)
@@ -103,7 +103,7 @@ public class PrivilegeInputCheckboxTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var cut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -125,7 +125,7 @@ public class PrivilegeInputCheckboxTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var cut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)
@@ -146,7 +146,7 @@ public class PrivilegeInputCheckboxTests : TestContext
         var model = new TestModel { IsActive = true };
         var editContext = new EditContext(model);
 
-        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var cut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(editContext)
             .Add(p => p.Value, model.IsActive)
             .Add(p => p.ValueExpression, () => model.IsActive)
@@ -167,7 +167,7 @@ public class PrivilegeInputCheckboxTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var cut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)

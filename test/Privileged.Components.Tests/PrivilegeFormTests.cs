@@ -1,13 +1,12 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeFormTests : TestContext
+public class PrivilegeFormTests : BunitContext
 {
     [Fact]
     public void Renders_Form_With_Basic_Parameters()
@@ -18,7 +17,7 @@ public class PrivilegeFormTests : TestContext
             .Allow("update", "TestModel")
             .Build();
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "User")
@@ -46,7 +45,7 @@ public class PrivilegeFormTests : TestContext
             .Allow("edit", "User", ["Name"])
             .Build();
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "User")
@@ -80,7 +79,7 @@ public class PrivilegeFormTests : TestContext
             .Allow("update", "Post", ["Name"])
             .Build();
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "User") // Form has User subject
@@ -115,7 +114,7 @@ public class PrivilegeFormTests : TestContext
             .Allow("modify", "User", ["Name"]) // Child will use 'modify' instead of 'update'
             .Build();
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "User")
@@ -152,7 +151,7 @@ public class PrivilegeFormTests : TestContext
             .Allow("view", "Profile", ["Age"])
             .Build(); // Note: no update permission for Profile Age
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "User")
@@ -201,7 +200,7 @@ public class PrivilegeFormTests : TestContext
         var model = new TestModel();
         var ctx = new PrivilegeBuilder().Build();
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.ChildContent, (EditContext context) => builder =>
@@ -225,7 +224,7 @@ public class PrivilegeFormTests : TestContext
             .Allow("update", "TestModel", ["Name"])
             .Build();
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             // No Subject parameter provided
@@ -260,7 +259,7 @@ public class PrivilegeFormTests : TestContext
         var validSubmitCalled = false;
         var invalidSubmitCalled = false;
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "ValidationTestModel")
@@ -297,7 +296,7 @@ public class PrivilegeFormTests : TestContext
             .Allow("modify", "NewSubject")
             .Build();
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "User")
@@ -319,8 +318,9 @@ public class PrivilegeFormTests : TestContext
         var type = input.GetAttribute("type") ?? "text";
         type.Should().Be("text");
 
+
         // Update form parameters
-        cut.SetParametersAndRender(ps => ps
+        cut.Render(ps => ps
             .Add(p => p.Subject, "NewSubject")
             .Add(p => p.ReadAction, "view")
             .Add(p => p.UpdateAction, "modify")
@@ -340,7 +340,7 @@ public class PrivilegeFormTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No permissions defined
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "") // Empty subject
@@ -372,7 +372,7 @@ public class PrivilegeFormTests : TestContext
 
         var capturedFormState = (PrivilegeFormState?)null;
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             .Add(p => p.Subject, "TestSubject")
@@ -402,7 +402,7 @@ public class PrivilegeFormTests : TestContext
 
         var capturedFormState = (PrivilegeFormState?)null;
 
-        var cut = RenderComponent<PrivilegeForm>(ps => ps
+        var cut = Render<PrivilegeForm>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Model, model)
             // Not setting Subject, ReadAction, or UpdateAction - should be null

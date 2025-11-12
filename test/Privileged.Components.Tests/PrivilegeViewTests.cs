@@ -1,8 +1,6 @@
-using System.Collections.Generic;
-
 namespace Privileged.Components.Tests;
 
-public class PrivilegeViewTests : TestContext
+public class PrivilegeViewTests : BunitContext
 {
     [Fact]
     public void AuthorizedChildContent()
@@ -11,7 +9,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("read", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "Post")
@@ -30,7 +28,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("read", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "Post")
@@ -50,7 +48,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("read", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "Post")
@@ -70,7 +68,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("read", "Post")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "Post")
@@ -89,7 +87,7 @@ public class PrivilegeViewTests : TestContext
         var context = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "") // Empty subject
@@ -106,7 +104,7 @@ public class PrivilegeViewTests : TestContext
         var context = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, (string?)null) // Null subject
@@ -123,7 +121,7 @@ public class PrivilegeViewTests : TestContext
         var context = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "   ") // Whitespace subject
@@ -140,7 +138,7 @@ public class PrivilegeViewTests : TestContext
         var context = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "delete")
             .Add(p => p.Subject, "") // Empty subject
@@ -158,7 +156,7 @@ public class PrivilegeViewTests : TestContext
         var context = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "update")
             .Add(p => p.Subject, "") // Empty subject
@@ -179,7 +177,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("read", "Comment")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, new[] { "Post", "User", "Comment" })
@@ -197,7 +195,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("read", "Admin")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, new[] { "Post", "User", "Comment" })
@@ -217,7 +215,7 @@ public class PrivilegeViewTests : TestContext
             .Forbid("read", "User")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "User") // This should be ignored
@@ -236,7 +234,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("read", "User")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "User")
@@ -257,7 +255,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("update", "Comment")
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "update")
             .Add(p => p.Subjects, new[] { "Post", "User", "Comment" })
@@ -275,7 +273,7 @@ public class PrivilegeViewTests : TestContext
             .Allow("read", PrivilegeRule.Any) // Allow read on all subjects
             .Build();
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, new[] { "Post", "User", "Comment", "Admin" })
@@ -292,7 +290,7 @@ public class PrivilegeViewTests : TestContext
         var context = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeView>(parameters => parameters
+        var cut = Render<PrivilegeView>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "") // Empty subject

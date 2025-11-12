@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeInputSelectTests : TestContext
+public class PrivilegeInputSelectTests : BunitContext
 {
     [Fact]
     public void Renders_Select_When_Read_And_Update_Allowed()
@@ -15,7 +15,7 @@ public class PrivilegeInputSelectTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.Option)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)
@@ -48,7 +48,7 @@ public class PrivilegeInputSelectTests : TestContext
             .Allow("read", nameof(TestModel), [nameof(TestModel.Option)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)
@@ -75,7 +75,7 @@ public class PrivilegeInputSelectTests : TestContext
         var editContext = new EditContext(model);
         var ctx = new PrivilegeBuilder().Build(); // no permissions
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)
@@ -105,7 +105,7 @@ public class PrivilegeInputSelectTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)
@@ -137,7 +137,7 @@ public class PrivilegeInputSelectTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)
             .Add(p => p.ValueExpression, () => model.Option)
@@ -168,7 +168,7 @@ public class PrivilegeInputSelectTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)
@@ -200,7 +200,7 @@ public class PrivilegeInputSelectTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)
@@ -227,7 +227,7 @@ public class PrivilegeInputSelectTests : TestContext
         var model = new TestModel { Option = "B" };
         var editContext = new EditContext(model);
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(editContext)
             .Add(p => p.Value, model.Option)
             .Add(p => p.ValueExpression, () => model.Option)
@@ -258,7 +258,7 @@ public class PrivilegeInputSelectTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputSelect<string>>(ps => ps
+        var cut = Render<PrivilegeInputSelect<string>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Option)

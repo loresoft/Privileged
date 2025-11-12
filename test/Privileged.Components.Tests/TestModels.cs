@@ -1,5 +1,3 @@
-using System;
-
 namespace Privileged.Components.Tests;
 
 internal class TestModel

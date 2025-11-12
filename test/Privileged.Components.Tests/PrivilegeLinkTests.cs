@@ -1,9 +1,6 @@
-using System;
-using System.Collections.Generic;
-
 namespace Privileged.Components.Tests;
 
-public class PrivilegeLinkTests : TestContext
+public class PrivilegeLinkTests : BunitContext
 {
     [Fact]
     public void RendersWhenUserHasPermission()
@@ -14,7 +11,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -37,7 +34,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -60,7 +57,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
@@ -81,7 +78,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "edit")
@@ -104,7 +101,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "edit")
@@ -127,7 +124,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "edit")
@@ -150,7 +147,7 @@ public class PrivilegeLinkTests : TestContext
             .Build(); // No specific permissions
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "") // Empty subject - should assume all privileges
             .Add(p => p.Action, "read")
@@ -172,7 +169,7 @@ public class PrivilegeLinkTests : TestContext
             .Build(); // No specific permissions
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, (string?)null) // Null subject - should assume all privileges
             .Add(p => p.Action, "read")
@@ -194,7 +191,7 @@ public class PrivilegeLinkTests : TestContext
             .Build(); // No specific permissions
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "   ") // Whitespace subject - should assume all privileges
             .Add(p => p.Action, "read")
@@ -216,7 +213,7 @@ public class PrivilegeLinkTests : TestContext
             .Build(); // No specific permissions
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "") // Empty subject
             .Add(p => p.Action, "edit")
@@ -235,7 +232,7 @@ public class PrivilegeLinkTests : TestContext
     public void NoPrivilegeContext_AssumeAllPrivileges_RendersLink()
     {
         // When no PrivilegeContext is provided, component should assume all privileges
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
             .Add(p => p.AdditionalAttributes, new Dictionary<string, object> { { "href", "/posts" } })
@@ -252,7 +249,7 @@ public class PrivilegeLinkTests : TestContext
     public void NoPrivilegeContext_WithHideForbidden_DoesNotHide()
     {
         // When no PrivilegeContext is provided, all privileges are assumed, so link should not hide
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
             .Add(p => p.HideForbidden, true)
@@ -276,7 +273,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -304,7 +301,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act - Should render for general read permission
-        var cut1 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut1 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -313,7 +310,7 @@ public class PrivilegeLinkTests : TestContext
         );
 
         // Act - Should NOT render for forbidden qualifier
-        var cut2 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut2 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -337,7 +334,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -366,7 +363,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -390,7 +387,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -414,7 +411,7 @@ public class PrivilegeLinkTests : TestContext
             .Build(); // No specific permissions
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "") // Empty subject - should assume all privileges
             .Add(p => p.Action, "read")
@@ -438,7 +435,7 @@ public class PrivilegeLinkTests : TestContext
             .Build(); // No specific permissions
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, (string?)null) // Null subject - should assume all privileges
             .Add(p => p.Action, "read")
@@ -462,7 +459,7 @@ public class PrivilegeLinkTests : TestContext
             .Build(); // No specific permissions
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "   ") // Whitespace subject - should assume all privileges
             .Add(p => p.Action, "read")
@@ -487,7 +484,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act - Should render with allowed qualifier
-        var cut1 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut1 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "edit")
@@ -498,7 +495,7 @@ public class PrivilegeLinkTests : TestContext
         );
 
         // Act - Should NOT render with forbidden qualifier
-        var cut2 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut2 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "edit")
@@ -527,7 +524,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act - Should render for general read permission
-        var cut1 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut1 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -537,7 +534,7 @@ public class PrivilegeLinkTests : TestContext
         );
 
         // Act - Should be hidden for forbidden qualifier
-        var cut2 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut2 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -565,7 +562,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, ["Post", "User", "Comment"])
@@ -588,7 +585,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, ["Post", "User", "Comment"])
@@ -613,7 +610,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, ["Post", "User", "Comment"])
@@ -638,7 +635,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act - Not setting HideForbidden (should default to false)
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -662,7 +659,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Subject, "Post")
             .Add(p => p.Action, "read")
@@ -685,7 +682,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act
-        var cut = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, ["Post", "User"])
@@ -710,7 +707,7 @@ public class PrivilegeLinkTests : TestContext
             .Build();
 
         // Act - Should render for general read permission on Post/Comment subjects
-        var cut1 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut1 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, ["Post", "Comment"])
@@ -720,7 +717,7 @@ public class PrivilegeLinkTests : TestContext
 
         // Act - Should render because when using Subjects, the qualifier is ignored
         // and Post is generally allowed for "read" action (forbid only applies to specific qualifier)
-        var cut2 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut2 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subjects, ["Post"])
@@ -730,7 +727,7 @@ public class PrivilegeLinkTests : TestContext
         );
 
         // Act - Using Subject (not Subjects) should respect the qualifier and render as span
-        var cut3 = RenderComponent<PrivilegeLink>(parameters => parameters
+        var cut3 = Render<PrivilegeLink>(parameters => parameters
             .AddCascadingValue(context)
             .Add(p => p.Action, "read")
             .Add(p => p.Subject, "Post") // Using Subject instead of Subjects

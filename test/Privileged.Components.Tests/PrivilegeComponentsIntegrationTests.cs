@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeComponentsIntegrationTests : TestContext
+public class PrivilegeComponentsIntegrationTests : BunitContext
 {
     [Fact]
     public void Components_Use_Default_Actions_When_Not_Specified()
@@ -15,7 +15,7 @@ public class PrivilegeComponentsIntegrationTests : TestContext
             .Allow("update", nameof(TestModel)) // Default update action
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -42,7 +42,7 @@ public class PrivilegeComponentsIntegrationTests : TestContext
             .Allow("update", nameof(TestModel))
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -70,7 +70,7 @@ public class PrivilegeComponentsIntegrationTests : TestContext
             .Build();
 
         // Test Text input (should be editable)
-        var textCut = RenderComponent<PrivilegeInputText>(ps => ps
+        var textCut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -84,7 +84,7 @@ public class PrivilegeComponentsIntegrationTests : TestContext
         textInput.HasAttribute("readonly").Should().BeFalse();
 
         // Test Number input (should be readonly)
-        var numberCut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var numberCut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
@@ -98,7 +98,7 @@ public class PrivilegeComponentsIntegrationTests : TestContext
         numberInput.HasAttribute("readonly").Should().BeTrue();
 
         // Test Checkbox (should be disabled)
-        var checkboxCut = RenderComponent<PrivilegeInputCheckbox>(ps => ps
+        var checkboxCut = Render<PrivilegeInputCheckbox>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.IsActive)

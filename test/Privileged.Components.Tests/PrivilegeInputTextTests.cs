@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeInputTextTests : TestContext
+public class PrivilegeInputTextTests : BunitContext
 {
     [Fact]
     public void Renders_Text_Input_When_Read_And_Update_Allowed()
@@ -15,7 +15,7 @@ public class PrivilegeInputTextTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.Name)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -41,7 +41,7 @@ public class PrivilegeInputTextTests : TestContext
             .Allow("read", nameof(TestModel), [nameof(TestModel.Name)])
             .Build(); // no update rule
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -66,7 +66,7 @@ public class PrivilegeInputTextTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // no permissions
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -90,7 +90,7 @@ public class PrivilegeInputTextTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.Name)])
             .Build(); // only update
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -114,7 +114,7 @@ public class PrivilegeInputTextTests : TestContext
     .Allow("update", nameof(TestModel))
     .Build();
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
     .AddCascadingValue(ctx)
        .Add(p => p.Value, model.Name)
@@ -123,24 +123,24 @@ public class PrivilegeInputTextTests : TestContext
         // Intentionally not setting Subject and Field - should fallback to model name and name attribute
         );
 
-   var input = cut.Find("input");
-      // For text inputs, the type attribute may not be explicitly set since "text" is the default
- var type = input.GetAttribute("type") ?? "text";
+        var input = cut.Find("input");
+        // For text inputs, the type attribute may not be explicitly set since "text" is the default
+        var type = input.GetAttribute("type") ?? "text";
         type.Should().Be("text");
         input.HasAttribute("readonly").Should().BeFalse();
 
-  // Verify the input has a name attribute (which would be used as the field fallback)
+        // Verify the input has a name attribute (which would be used as the field fallback)
         input.HasAttribute("name").Should().BeTrue();
     }
 
     [Fact]
     public void NoPrivilegeContext_AssumeAllPrivileges_RendersNormalTextInput()
-{
+    {
         // When no PrivilegeContext is provided, component should assume all privileges
-   var model = new TestModel { Name = "Test" };
-   var editContext = new EditContext(model);
+        var model = new TestModel { Name = "Test" };
+        var editContext = new EditContext(model);
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
       .AddCascadingValue(editContext)
             .Add(p => p.Value, model.Name)
       .Add(p => p.ValueExpression, () => model.Name)
@@ -152,9 +152,9 @@ public class PrivilegeInputTextTests : TestContext
         var input = cut.Find("input");
         var type = input.GetAttribute("type") ?? "text";
         type.Should().Be("text");
-      input.HasAttribute("readonly").Should().BeFalse();
-  input.HasAttribute("disabled").Should().BeFalse();
-}
+        input.HasAttribute("readonly").Should().BeFalse();
+        input.HasAttribute("disabled").Should().BeFalse();
+    }
 
     [Fact]
     public void EmptySubject_AssumeAllPrivileges_RendersNormalTextInput()
@@ -164,7 +164,7 @@ public class PrivilegeInputTextTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -189,7 +189,7 @@ public class PrivilegeInputTextTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
             .Add(p => p.ValueExpression, () => model.Name)
@@ -213,7 +213,7 @@ public class PrivilegeInputTextTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -238,7 +238,7 @@ public class PrivilegeInputTextTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)
@@ -263,7 +263,7 @@ public class PrivilegeInputTextTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputText>(ps => ps
+        var cut = Render<PrivilegeInputText>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Name)

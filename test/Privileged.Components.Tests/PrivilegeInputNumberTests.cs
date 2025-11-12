@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Components.Forms;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeInputNumberTests : TestContext
+public class PrivilegeInputNumberTests : BunitContext
 {
     [Fact]
     public void Renders_Number_Input_When_Read_And_Update_Allowed()
@@ -15,7 +15,7 @@ public class PrivilegeInputNumberTests : TestContext
             .Allow("update", nameof(TestModel), [nameof(TestModel.Age)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
@@ -39,7 +39,7 @@ public class PrivilegeInputNumberTests : TestContext
             .Allow("read", nameof(TestModel), [nameof(TestModel.Age)])
             .Build();
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
@@ -61,7 +61,7 @@ public class PrivilegeInputNumberTests : TestContext
         var editContext = new EditContext(model);
         var ctx = new PrivilegeBuilder().Build();
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
@@ -84,7 +84,7 @@ public class PrivilegeInputNumberTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
@@ -107,7 +107,7 @@ public class PrivilegeInputNumberTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
             .Add(p => p.ValueExpression, () => model.Age)
@@ -130,7 +130,7 @@ public class PrivilegeInputNumberTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
@@ -154,7 +154,7 @@ public class PrivilegeInputNumberTests : TestContext
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)
@@ -177,7 +177,7 @@ public class PrivilegeInputNumberTests : TestContext
         var model = new TestModel { Age = 42 };
         var editContext = new EditContext(model);
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .Add(p => p.Value, model.Age)
             .Add(p => p.ValueExpression, () => model.Age)
@@ -186,10 +186,10 @@ public class PrivilegeInputNumberTests : TestContext
             .Add(p => p.Field, nameof(TestModel.Age))
   );
 
-   var input = cut.Find("input");
-  input.GetAttribute("type").Should().Be("number");
-   input.HasAttribute("readonly").Should().BeFalse();
-input.HasAttribute("disabled").Should().BeFalse();
+        var input = cut.Find("input");
+        input.GetAttribute("type").Should().Be("number");
+        input.HasAttribute("readonly").Should().BeFalse();
+        input.HasAttribute("disabled").Should().BeFalse();
     }
 
     [Fact]
@@ -200,7 +200,7 @@ input.HasAttribute("disabled").Should().BeFalse();
         var ctx = new PrivilegeBuilder()
             .Build(); // No specific permissions
 
-        var cut = RenderComponent<PrivilegeInputNumber<int>>(ps => ps
+        var cut = Render<PrivilegeInputNumber<int>>(ps => ps
             .AddCascadingValue(editContext)
             .AddCascadingValue(ctx)
             .Add(p => p.Value, model.Age)

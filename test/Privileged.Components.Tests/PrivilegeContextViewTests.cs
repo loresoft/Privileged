@@ -1,6 +1,5 @@
-using System;
 using System.Security.Claims;
-using System.Threading.Tasks;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Rendering;
@@ -8,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Privileged.Components.Tests;
 
-public class PrivilegeContextViewTests : TestContext
+public class PrivilegeContextViewTests : BunitContext
 {
     public PrivilegeContextViewTests()
     {
@@ -29,7 +28,7 @@ public class PrivilegeContextViewTests : TestContext
         var mockProvider = new MockPrivilegeContextProvider(null);
         Services.AddSingleton<IPrivilegeContextProvider>(mockProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loading, builder => builder.AddMarkupContent(0, "<p>Loading privileges...</p>"))
             .Add(p => p.Loaded, builder => builder.AddMarkupContent(0, "<p>Content loaded</p>"))
         );
@@ -43,7 +42,7 @@ public class PrivilegeContextViewTests : TestContext
         var mockProvider = new MockPrivilegeContextProvider(null);
         Services.AddSingleton<IPrivilegeContextProvider>(mockProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loaded, builder => builder.AddMarkupContent(0, "<p>Content loaded</p>"))
         );
 
@@ -60,7 +59,7 @@ public class PrivilegeContextViewTests : TestContext
         var mockProvider = new MockPrivilegeContextProvider(context);
         Services.AddSingleton<IPrivilegeContextProvider>(mockProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loading, builder => builder.AddMarkupContent(0, "<p>Loading privileges...</p>"))
             .Add(p => p.Loaded, builder => builder.AddMarkupContent(0, "<p>Privileges loaded successfully</p>"))
         );
@@ -78,7 +77,7 @@ public class PrivilegeContextViewTests : TestContext
         var mockProvider = new MockPrivilegeContextProvider(context);
         Services.AddSingleton<IPrivilegeContextProvider>(mockProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loading, builder => builder.AddMarkupContent(0, "<p>Loading privileges...</p>"))
             .Add(p => p.ChildContent, builder => builder.AddMarkupContent(0, "<p>Child content displayed</p>"))
         );
@@ -96,7 +95,7 @@ public class PrivilegeContextViewTests : TestContext
         var mockProvider = new MockPrivilegeContextProvider(context);
         Services.AddSingleton<IPrivilegeContextProvider>(mockProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loading, builder => builder.AddMarkupContent(0, "<p>Loading privileges...</p>"))
             .Add(p => p.Loaded, builder => builder.AddMarkupContent(0, "<p>Loaded content</p>"))
             .Add(p => p.ChildContent, builder => builder.AddMarkupContent(0, "<p>Child content</p>"))
@@ -117,7 +116,7 @@ public class PrivilegeContextViewTests : TestContext
         var mockProvider = new MockPrivilegeContextProvider(context);
         Services.AddSingleton<IPrivilegeContextProvider>(mockProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loaded, (RenderTreeBuilder builder) =>
             {
                 builder.OpenComponent<TestPrivilegeConsumer>(0);
@@ -142,7 +141,7 @@ public class PrivilegeContextViewTests : TestContext
         var asyncProvider = new AsyncMockPrivilegeContextProvider(context, TimeSpan.FromMilliseconds(50));
         Services.AddSingleton<IPrivilegeContextProvider>(asyncProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loading, builder => builder.AddMarkupContent(0, "<div class='loading'>Loading...</div>"))
             .Add(p => p.Loaded, builder => builder.AddMarkupContent(0, "<div class='loaded'>Ready!</div>"))
         );
@@ -158,7 +157,7 @@ public class PrivilegeContextViewTests : TestContext
         var realProvider = new TestPrivilegeContextProvider();
         Services.AddSingleton<IPrivilegeContextProvider>(realProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loading, builder => builder.AddMarkupContent(0, "<span>Loading real context...</span>"))
             .Add(p => p.Loaded, (RenderTreeBuilder builder) =>
             {
@@ -180,7 +179,7 @@ public class PrivilegeContextViewTests : TestContext
         var mockProvider = new NullReturningProvider();
         Services.AddSingleton<IPrivilegeContextProvider>(mockProvider);
 
-        var cut = RenderComponent<PrivilegeContextView>(parameters => parameters
+        var cut = Render<PrivilegeContextView>(parameters => parameters
             .Add(p => p.Loading, builder => builder.AddMarkupContent(0, "<div class='loading'>Loading...</div>"))
             .Add(p => p.Loaded, builder => builder.AddMarkupContent(0, "<div class='loaded'>Ready!</div>"))
         );
