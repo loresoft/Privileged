@@ -23,7 +23,7 @@ public class PrivilegeContextProvider : IPrivilegeContextProvider
 
             // Global allowances
             .Allow("read", PrivilegeRule.Any)                 // read everything
-            .Allow("update", "Product", ["Title", "Summary", "Password"]) // update selected product fields
+            .Allow("update", "Product", ["Title", "Summary", "Password", "ReleaseDate"]) // update selected product fields
             .Allow("create", "Product")
             .Allow("read", "Order")
 

@@ -77,7 +77,11 @@ else
             </div>
             <div class="col-md-4">
                 <label class="form-label">Password</label>
-                <PrivilegeInputPassword class="form-control" @bind-Value="Model.Password" Subject="Product" Field="Password" Togglable="false" ToggleClass="text-body-tertiary" />
+                <PrivilegeInputPassword class="form-control" @bind-Value="Model.Password" Subject="Product" Field="Password" Togglable="true" ToggleClass="text-body-tertiary" />
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Release Date</label>
+                <PrivilegeInputDate class="form-control" @bind-Value="Model.ReleaseDate" Subject="Product" Field="ReleaseDate" />
             </div>
 
         </div>
@@ -95,7 +99,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var field in new[] { "Title", "Summary", "Cost", "InternalNotes", "Password" })
+            @foreach (var field in new[] { "Title", "Summary", "Cost", "InternalNotes", "Password", "ReleaseDate" })
             {
                 <tr>
                     <td>@field</td>
@@ -128,5 +132,7 @@ else
         public string InternalNotes { get; set; } = "Secret stuff";
 
         public string Password { get; set; } = "P@ssw0rd!";
+
+        public DateOnly ReleaseDate { get; set; }
     }
 }
