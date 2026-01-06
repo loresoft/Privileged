@@ -27,9 +27,9 @@ namespace Privileged.Components;
 /// </remarks>
 /// <example>
 /// <code>
-/// &lt;PrivilegeInputDate @bind-Value="model.BirthDate" 
-///                     Subject="Employee" 
-///                     Field="BirthDate" 
+/// &lt;PrivilegeInputDate @bind-Value="model.BirthDate"
+///                     Subject="Employee"
+///                     Field="BirthDate"
 ///                     type="date" /&gt;
 /// </code>
 /// </example>
@@ -64,7 +64,7 @@ public class PrivilegeInputDate<TValue> : InputDate<TValue>
     protected PrivilegeFormState? PrivilegeFormState { get; set; }
 
     /// <summary>
-    /// Gets or sets the subject for privilege evaluation. 
+    /// Gets or sets the subject for privilege evaluation.
     /// </summary>
     /// <value>
     /// The subject string used for privilege evaluation. If not specified, defaults to:
@@ -228,8 +228,8 @@ public class PrivilegeInputDate<TValue> : InputDate<TValue>
     /// <item><description>Maintains the element reference for form integration</description></item>
     /// </list>
     /// <para>
-    /// Note that when no read permission is granted, a single-line password input is rendered instead of 
-    /// a date input to maintain security and hide sensitive date information such as birth dates, hire dates, 
+    /// Note that when no read permission is granted, a single-line password input is rendered instead of
+    /// a date input to maintain security and hide sensitive date information such as birth dates, hire dates,
     /// or other personally identifiable temporal data.
     /// </para>
     /// </remarks>
@@ -257,5 +257,21 @@ public class PrivilegeInputDate<TValue> : InputDate<TValue>
         builder.AddAttribute(6, "value", CurrentValueAsString);
         builder.AddElementReferenceCapture(7, __inputReference => Element = __inputReference);
         builder.CloseElement();
+    }
+
+    protected override string FormatValueAsString(TValue? value)
+    {
+        // treat MinValue as empty
+        if (value is DateTime dateTime && dateTime == DateTime.MinValue)
+            return string.Empty;
+
+        if (value is DateTimeOffset dateTimeOffset && dateTimeOffset == DateTimeOffset.MinValue)
+            return string.Empty;
+
+        if (value is DateOnly dateOnly && dateOnly == DateOnly.MinValue)
+            return string.Empty;
+
+        // otherwise, use base implementation
+        return base.FormatValueAsString(value);
     }
 }

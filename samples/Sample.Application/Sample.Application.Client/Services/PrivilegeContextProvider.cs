@@ -17,20 +17,20 @@ public class PrivilegeContextProvider : IPrivilegeContextProvider
         // Simulate different privilege sets. This could be swapped based on a fake user id.
         var builder = new PrivilegeBuilder()
             // Aliases
-            .Alias("Crud", new[] { "create", "read", "update", "delete" }, PrivilegeMatch.Action)
-            .Alias("PublicFields", new[] { "Title", "Summary" }, PrivilegeMatch.Qualifier)
-            .Alias("SensitiveFields", new[] { "Cost", "InternalNotes" }, PrivilegeMatch.Qualifier)
+            .Alias("Crud", ["create", "read", "update", "delete"], PrivilegeMatch.Action)
+            .Alias("PublicFields", ["Title", "Summary"], PrivilegeMatch.Qualifier)
+            .Alias("SensitiveFields", ["Cost", "InternalNotes"], PrivilegeMatch.Qualifier)
 
             // Global allowances
             .Allow("read", PrivilegeRule.Any)                 // read everything
-            .Allow("update", "Product", new[] { "Title", "Summary" }) // update selected product fields
+            .Allow("update", "Product", ["Title", "Summary", "Password"]) // update selected product fields
             .Allow("create", "Product")
             .Allow("read", "Order")
 
             // Forbid some specifics
             .Forbid("delete", "Product")
-            .Forbid("update", "Product", new[] { "Cost" })      // override broader rules
-            .Forbid("read", "Product", new[] { "InternalNotes" });
+            .Forbid("update", "Product", ["Cost"])      // override broader rules
+            .Forbid("read", "Product", ["InternalNotes"]);
 
         _cached = builder.Build();
         return ValueTask.FromResult(_cached);

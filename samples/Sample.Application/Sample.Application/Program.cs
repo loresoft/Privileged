@@ -6,6 +6,7 @@ using Sample.Application.Client.Services;
 using Sample.Application.Components;
 
 namespace Sample.Application;
+
 public class Program
 {
     public static void Main(string[] args)

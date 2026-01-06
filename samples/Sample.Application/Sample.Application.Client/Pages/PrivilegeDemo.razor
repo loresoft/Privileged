@@ -75,6 +75,11 @@ else
                 <label class="form-label">Internal Notes</label>
                 <PrivilegeInputTextArea class="form-control" @bind-Value="Model.InternalNotes" Subject="Product" Field="InternalNotes" />
             </div>
+            <div class="col-md-4">
+                <label class="form-label">Password</label>
+                <PrivilegeInputPassword class="form-control" @bind-Value="Model.Password" Subject="Product" Field="Password" Togglable="false" ToggleClass="text-body-tertiary" />
+            </div>
+
         </div>
 
         <button type="submit" class="btn btn-primary mt-3">Save</button>
@@ -90,7 +95,7 @@ else
             </tr>
         </thead>
         <tbody>
-            @foreach (var field in new[] { "Title", "Summary", "Cost", "InternalNotes" })
+            @foreach (var field in new[] { "Title", "Summary", "Cost", "InternalNotes", "Password" })
             {
                 <tr>
                     <td>@field</td>
@@ -121,5 +126,7 @@ else
         public string Summary { get; set; } = "Summary goes here";
         public decimal Cost { get; set; } = 42.5m;
         public string InternalNotes { get; set; } = "Secret stuff";
+
+        public string Password { get; set; } = "P@ssw0rd!";
     }
 }

@@ -41,7 +41,7 @@ namespace Privileged.Components;
 ///         &lt;/PrivilegeForm&gt;
 ///     &lt;/Loaded&gt;
 /// &lt;/PrivilegeContextView&gt;
-/// 
+///
 /// &lt;!-- Simplified usage with ChildContent --&gt;
 /// &lt;PrivilegeContextView&gt;
 ///     &lt;PrivilegeInputText @bind-Value="model.SecretField" Subject="Document" Field="Secret" /&gt;
@@ -53,37 +53,14 @@ namespace Privileged.Components;
 /// <seealso cref="AuthenticationStateProvider"/>
 public class PrivilegeContextView : ComponentBase
 {
-    /// <summary>
-    /// Gets or sets the provider for retrieving the privilege context.
-    /// This service is automatically injected and must be registered in the dependency injection container.
-    /// </summary>
-    /// <value>
-    /// An <see cref="IPrivilegeContextProvider"/> instance used to asynchronously load the privilege context.
-    /// This service should be registered in the dependency injection container.
-    /// </value>
-    /// <remarks>
-    /// The provider is responsible for loading user-specific privilege rules and aliases, typically from
-    /// a database, cache, or external authorization service. The implementation should handle user identity
-    /// and return appropriate privilege contexts based on the authenticated user's roles and permissions.
-    /// </remarks>
-    [Inject]
-    protected IPrivilegeContextProvider PrivilegeContextProvider { get; set; } = default!;
+    public PrivilegeContextView(
+        IPrivilegeContextProvider privilegeContextProvider,
+        AuthenticationStateProvider? authenticationStateProvider = null)
+    {
+        PrivilegeContextProvider = privilegeContextProvider;
+        AuthenticationStateProvider = authenticationStateProvider;
+    }
 
-    /// <summary>
-    /// Gets or sets the authentication state provider used to retrieve the current user's authentication information.
-    /// This service is automatically injected from the Blazor authentication system.
-    /// </summary>
-    /// <value>
-    /// An <see cref="AuthenticationStateProvider"/> instance used to retrieve the current user's authentication state.
-    /// This is passed to the privilege context provider to load user-specific privileges.
-    /// </value>
-    /// <remarks>
-    /// The authentication state contains the current user's <see cref="System.Security.Claims.ClaimsPrincipal"/>, 
-    /// which is used by the privilege context provider to determine what privileges should be loaded.
-    /// This enables user-specific privilege evaluation based on identity, roles, and claims.
-    /// </remarks>
-    [Inject]
-    protected AuthenticationStateProvider AuthenticationStateProvider { get; set; } = default!;
 
     /// <summary>
     /// Gets or sets the render fragment to display while the privilege context is loading.
@@ -164,6 +141,37 @@ public class PrivilegeContextView : ComponentBase
     [Parameter]
     public RenderFragment? ChildContent { get; set; }
 
+
+    /// <summary>
+    /// Gets or sets the provider for retrieving the privilege context.
+    /// This service is automatically injected and must be registered in the dependency injection container.
+    /// </summary>
+    /// <value>
+    /// An <see cref="IPrivilegeContextProvider"/> instance used to asynchronously load the privilege context.
+    /// This service should be registered in the dependency injection container.
+    /// </value>
+    /// <remarks>
+    /// The provider is responsible for loading user-specific privilege rules and aliases, typically from
+    /// a database, cache, or external authorization service. The implementation should handle user identity
+    /// and return appropriate privilege contexts based on the authenticated user's roles and permissions.
+    /// </remarks>
+    protected IPrivilegeContextProvider PrivilegeContextProvider { get; }
+
+    /// <summary>
+    /// Gets or sets the authentication state provider used to retrieve the current user's authentication information.
+    /// This service is automatically injected from the Blazor authentication system.
+    /// </summary>
+    /// <value>
+    /// An <see cref="AuthenticationStateProvider"/> instance used to retrieve the current user's authentication state.
+    /// This is passed to the privilege context provider to load user-specific privileges.
+    /// </value>
+    /// <remarks>
+    /// The authentication state contains the current user's <see cref="System.Security.Claims.ClaimsPrincipal"/>,
+    /// which is used by the privilege context provider to determine what privileges should be loaded.
+    /// This enables user-specific privilege evaluation based on identity, roles, and claims.
+    /// </remarks>
+    protected AuthenticationStateProvider? AuthenticationStateProvider { get; }
+
     /// <summary>
     /// Gets or sets the privilege context used for evaluating privilege rules.
     /// </summary>
@@ -177,7 +185,8 @@ public class PrivilegeContextView : ComponentBase
     /// privilege-aware behavior throughout the component tree. The loading state can be determined by
     /// checking if this property is <c>null</c>.
     /// </remarks>
-    protected PrivilegeContext? PrivilegeContext { get; set; }
+    protected PrivilegeContext? PrivilegeContext { get; private set; }
+
 
     /// <summary>
     /// Builds the render tree for the component, displaying the appropriate content based on the loading state
@@ -204,8 +213,8 @@ public class PrivilegeContextView : ComponentBase
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
         builder.OpenComponent<CascadingValue<PrivilegeContext?>>(0);
-        builder.AddAttribute(1, nameof(CascadingValue<PrivilegeContext?>.Value), PrivilegeContext);
-        builder.AddAttribute(2, nameof(CascadingValue<PrivilegeContext?>.ChildContent), BuildChildContent());
+        builder.AddAttribute(1, nameof(CascadingValue<>.Value), PrivilegeContext);
+        builder.AddAttribute(2, nameof(CascadingValue<>.ChildContent), BuildChildContent());
         builder.CloseComponent();
     }
 
@@ -232,8 +241,8 @@ public class PrivilegeContextView : ComponentBase
     /// </remarks>
     protected override async Task OnInitializedAsync()
     {
-        var authenticationState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        PrivilegeContext = await PrivilegeContextProvider.GetContextAsync(authenticationState.User);
+        var authenticationState = AuthenticationStateProvider != null ? await AuthenticationStateProvider.GetAuthenticationStateAsync() : null;
+        PrivilegeContext = await PrivilegeContextProvider.GetContextAsync(authenticationState?.User);
         StateHasChanged();
     }
 
