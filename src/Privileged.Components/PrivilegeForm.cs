@@ -148,8 +148,9 @@ public class PrivilegeForm : EditForm
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
         builder.OpenComponent<CascadingValue<PrivilegeFormState>>(0);
-        builder.AddAttribute(1, "Value", PrivilegeFormState);
-        builder.AddAttribute(2, "ChildContent", (RenderFragment)(childBuilder => base.BuildRenderTree(childBuilder)));
+        builder.AddAttribute(1, nameof(CascadingValue<>.Value), PrivilegeFormState);
+        builder.AddAttribute(2, nameof(CascadingValue<>.IsFixed), true);
+        builder.AddAttribute(3, nameof(CascadingValue<>.ChildContent), (RenderFragment)(childBuilder => base.BuildRenderTree(childBuilder)));
         builder.CloseComponent();
     }
 }
