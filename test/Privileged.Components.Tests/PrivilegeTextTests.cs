@@ -18,7 +18,7 @@ public class PrivilegeTextTests : BunitContext
 
         var button = cut.Find("button");
         Assert.NotNull(button);
-        
+
         cut.Find("div div").MarkupMatches("<div>••••••</div>");
     }
 
@@ -339,5 +339,96 @@ public class PrivilegeTextTests : BunitContext
 
         var button = cut.Find("button");
         Assert.NotNull(button);
+    }
+
+    [Fact]
+    public void NoContent_NullTextAndChildContent_RendersNothing()
+    {
+        var context = new PrivilegeBuilder()
+            .Allow("read", "Secret")
+            .Build();
+
+        var cut = Render<PrivilegeText>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Action, "read")
+            .Add(p => p.Subject, "Secret")
+            .Add(p => p.Text, (string?)null)
+        );
+
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("button"));
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("div"));
+    }
+
+    [Fact]
+    public void NoContent_EmptyText_RendersNothing()
+    {
+        var context = new PrivilegeBuilder()
+            .Allow("read", "Secret")
+            .Build();
+
+        var cut = Render<PrivilegeText>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Action, "read")
+            .Add(p => p.Subject, "Secret")
+            .Add(p => p.Text, "")
+        );
+
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("button"));
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("div"));
+    }
+
+    [Fact]
+    public void NoContent_WhitespaceText_RendersNothing()
+    {
+        var context = new PrivilegeBuilder()
+            .Allow("read", "Secret")
+            .Build();
+
+        var cut = Render<PrivilegeText>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Action, "read")
+            .Add(p => p.Subject, "Secret")
+            .Add(p => p.Text, "   ")
+        );
+
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("button"));
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("div"));
+    }
+
+    [Fact]
+    public void NoContent_UnauthorizedWithNoContent_RendersNothing()
+    {
+        var context = new PrivilegeBuilder()
+            .Forbid("read", "Secret")
+            .Build();
+
+        var cut = Render<PrivilegeText>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Action, "read")
+            .Add(p => p.Subject, "Secret")
+            .Add(p => p.Text, "")
+        );
+
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("button"));
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("div"));
+    }
+
+    [Fact]
+    public void NoContent_WithMaskedContent_StillRendersNothing()
+    {
+        var context = new PrivilegeBuilder()
+            .Allow("read", "Secret")
+            .Build();
+
+        var cut = Render<PrivilegeText>(parameters => parameters
+            .AddCascadingValue(context)
+            .Add(p => p.Action, "read")
+            .Add(p => p.Subject, "Secret")
+            .Add(p => p.Text, "")
+            .Add(p => p.MaskedContent, "<em>Hidden</em>")
+        );
+
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("button"));
+        Assert.Throws<Bunit.ElementNotFoundException>(() => cut.Find("div"));
     }
 }

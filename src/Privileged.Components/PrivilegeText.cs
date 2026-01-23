@@ -255,6 +255,19 @@ public class PrivilegeText : ComponentBase
     protected bool? IsAllowed { get; set; }
 
     /// <summary>
+    /// Gets or sets whether the component has content to display.
+    /// </summary>
+    /// <value>
+    /// <c>true</c> if either <see cref="ChildContent"/> is not null or <see cref="Text"/> is not null/empty/whitespace;
+    /// <c>false</c> otherwise.
+    /// </value>
+    /// <remarks>
+    /// This property is calculated in <see cref="OnParametersSet"/> and is used to determine
+    /// whether to render the toggle button and masked content.
+    /// </remarks>
+    protected bool HasContent { get; set; }
+
+    /// <summary>
     /// Gets or sets whether the content is currently shown (unmasked) by user interaction.
     /// </summary>
     /// <value>
@@ -293,6 +306,8 @@ public class PrivilegeText : ComponentBase
 
         IsAllowed = string.IsNullOrWhiteSpace(Subject)
             || PrivilegeContext?.Allowed(Action, Subject, Qualifier) == true;
+
+        HasContent = ChildContent != null || !string.IsNullOrWhiteSpace(Text);
     }
 
     /// <summary>
@@ -318,6 +333,9 @@ public class PrivilegeText : ComponentBase
     /// </remarks>
     protected override void BuildRenderTree(RenderTreeBuilder builder)
     {
+        if (!HasContent)
+            return;
+
         // Container
         builder.OpenElement(0, "div");
         builder.AddAttribute(1, "style", ContainerStyle);
