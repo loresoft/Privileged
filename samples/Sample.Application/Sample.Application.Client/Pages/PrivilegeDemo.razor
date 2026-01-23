@@ -109,7 +109,74 @@ else
             }
         </tbody>
     </table>
+
+    <h3 class="mt-4">Privilege Text Examples</h3>
+    <div class="row g-3">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Allowed - Simple Text</h5>
+                    <p class="card-text">
+                        <strong>API Key:</strong>
+                        <PrivilegeText Action="read" Subject="Product" Qualifier="ApiKey"
+                                       Text="sk-1234567890abcdef"
+                                       MaskedText="••••••••••••••••" />
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Forbidden - Always Masked</h5>
+                    <p class="card-text">
+                        <strong>Secret Token:</strong>
+                        <PrivilegeText Action="read" Subject="Admin" Qualifier="SecretToken"
+                                       Text="super-secret-token-xyz"
+                                       MaskedText="[RESTRICTED]" />
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Allowed - With ChildContent</h5>
+                    <p class="card-text">
+                        <strong>Internal Notes:</strong>
+                        <PrivilegeText Action="read" Subject="Product" Qualifier="InternalNotes">
+                            <ChildContent>
+                                <span class="text-info">This is sensitive internal information that can be toggled.</span>
+                            </ChildContent>
+                            <MaskedContent>
+                                <span class="text-muted fst-italic">Hidden content</span>
+                            </MaskedContent>
+                        </PrivilegeText>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Allowed - Credit Card</h5>
+                    <p class="card-text">
+                        <strong>Credit Card:</strong>
+                        <PrivilegeText Action="read" Subject="Product" Qualifier="Payment"
+                                       Text="4532-1234-5678-9010"
+                                       MaskedText="****-****-****-9010" />
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
 }
+
+<p></p>
 
 @code {
     [CascadingParameter]
