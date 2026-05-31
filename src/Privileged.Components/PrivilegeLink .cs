@@ -32,25 +32,25 @@ namespace Privileged.Components;
 /// &lt;PrivilegeLink Action="read" Subject="Post" href="/posts"&gt;
 ///     View Posts
 /// &lt;/PrivilegeLink&gt;
-/// 
+///
 /// &lt;!-- Link with multiple subjects (shown if user can edit any of these) --&gt;
-/// &lt;PrivilegeLink Action="edit" 
-///               Subjects='new[] { "Post", "Article", "News" }' 
+/// &lt;PrivilegeLink Action="edit"
+///               Subjects='new[] { "Post", "Article", "News" }'
 ///               href="/content"&gt;
 ///     Content Management
 /// &lt;/PrivilegeLink&gt;
-/// 
+///
 /// &lt;!-- Link with qualifier for fine-grained permissions --&gt;
-/// &lt;PrivilegeLink Action="update" 
-///               Subject="User" 
+/// &lt;PrivilegeLink Action="update"
+///               Subject="User"
 ///               Qualifier="Profile"
 ///               href="/profile"&gt;
 ///     Edit Profile
 /// &lt;/PrivilegeLink&gt;
-/// 
+///
 /// &lt;!-- Hidden when forbidden instead of disabled --&gt;
-/// &lt;PrivilegeLink Action="admin" 
-///               Subject="System" 
+/// &lt;PrivilegeLink Action="admin"
+///               Subject="System"
 ///               HideForbidden="true"
 ///               href="/admin"&gt;
 ///     Admin Panel
@@ -151,8 +151,8 @@ public class PrivilegeLink : NavLink
     /// </remarks>
     /// <example>
     /// <code>
-    /// &lt;PrivilegeLink Action="edit" 
-    ///               Subjects='new[] { "Post", "Article", "News" }' 
+    /// &lt;PrivilegeLink Action="edit"
+    ///               Subjects='new[] { "Post", "Article", "News" }'
     ///               href="/content"&gt;
     ///     Content Management
     /// &lt;/PrivilegeLink&gt;
@@ -207,6 +207,18 @@ public class PrivilegeLink : NavLink
     /// </remarks>
     [Parameter]
     public bool HideForbidden { get; set; }
+
+    /// <summary>
+    /// Gets or sets an optional CSS class (or space-separated class list) applied when the link is rendered
+    /// as a disabled <c>span</c> due to insufficient permissions.
+    /// </summary>
+    /// <value>
+    /// A CSS class string to append to the disabled span output. Can be <c>null</c>.
+    /// Duplicate class names are removed when combined with classes from
+    /// <see cref="NavLink.CssClass"/> and <see cref="NavLink.AdditionalAttributes"/>.
+    /// </value>
+    [Parameter]
+    public string? DisabledClass { get; set; } = "disabled";
 
     /// <summary>
     /// Gets a value indicating whether the user has permission to access this navigation link.
@@ -293,7 +305,9 @@ public class PrivilegeLink : NavLink
     /// </para>
     /// <list type="bullet">
     /// <item><description>Creates a span element instead of an anchor</description></item>
-    /// <item><description>Preserves all additional attributes from <see cref="NavLink.AdditionalAttributes"/></description></item>
+    /// <item><description>Preserves all additional attributes from <see cref="NavLink.AdditionalAttributes"/> except the <c>class</c> attribute, which is merged separately</description></item>
+    /// <item><description>Merges class names from <see cref="NavLink.AdditionalAttributes"/>, <see cref="NavLink.CssClass"/>, and <see cref="DisabledClass"/> into a single space-separated class value</description></item>
+    /// <item><description>Removes duplicate, null, empty, and whitespace-only class entries during merge</description></item>
     /// <item><description>Renders the same child content as the normal link would have</description></item>
     /// </list>
     /// <para>
@@ -314,10 +328,14 @@ public class PrivilegeLink : NavLink
             return;
         }
 
-        // render a span with the same attributes if no permission
+        var cssBuilder = new CssBuilder()
+            .MergeClass(AdditionalAttributes)
+            .AddClass(CssClass)
+            .AddClass(DisabledClass);
+
         builder.OpenElement(0, "span");
         builder.AddMultipleAttributes(1, AdditionalAttributes);
-        builder.AddAttribute(2, "class", CssClass);
+        builder.AddAttribute(2, "class", cssBuilder);
         builder.AddContent(3, ChildContent);
         builder.CloseElement();
     }
