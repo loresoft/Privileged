@@ -1,3 +1,5 @@
+using System.Text;
+
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
 using Microsoft.AspNetCore.Components.Routing;
@@ -328,15 +330,68 @@ public class PrivilegeLink : NavLink
             return;
         }
 
-        var cssBuilder = new CssBuilder()
-            .MergeClass(AdditionalAttributes)
-            .AddClass(CssClass)
-            .AddClass(DisabledClass);
+        // render a span with the same attributes if no permission
+        var (attributes, classString) = ResolveClass(AdditionalAttributes, CssClass, DisabledClass);
 
         builder.OpenElement(0, "span");
-        builder.AddMultipleAttributes(1, AdditionalAttributes);
-        builder.AddAttribute(2, "class", cssBuilder);
+        builder.AddMultipleAttributes(1, attributes);
+        builder.AddAttribute(2, "class", classString);
+
         builder.AddContent(3, ChildContent);
         builder.CloseElement();
+    }
+
+    private static (IEnumerable<KeyValuePair<string, object>>? attributes, string? classString) ResolveClass(
+        IReadOnlyDictionary<string, object>? additionalAttributes,
+        params IEnumerable<string?> classNames)
+    {
+        if (additionalAttributes == null && classNames == null)
+            return (null, null);
+
+        var classes = new HashSet<string>(StringComparer.Ordinal);
+
+        static void AddClasses(HashSet<string> classes, string? classValue)
+        {
+            if (string.IsNullOrWhiteSpace(classValue))
+                return;
+
+            foreach (var value in classValue.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries))
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                    classes.Add(value);
+            }
+        }
+
+        IEnumerable<KeyValuePair<string, object>>? attributes = null;
+
+        // Add classes from additionalAttributes if present
+        if (additionalAttributes != null)
+        {
+            if (additionalAttributes.TryGetValue("class", out var className)
+                && className is string classString)
+            {
+                AddClasses(classes, classString);
+            }
+
+            // Exclude the "class" attribute from the additional attributes to avoid duplication
+            var filteredAttributes = additionalAttributes
+                .Where(attribute => !string.Equals(attribute.Key, "class", StringComparison.OrdinalIgnoreCase))
+                .ToArray();
+
+            // Only set attributes if there are any after filtering
+            if (filteredAttributes.Length > 0)
+                attributes = filteredAttributes;
+        }
+
+        // Add classes from the provided classNames parameters
+        foreach (var className in classNames)
+            AddClasses(classes, className);
+
+        // Combine all classes into a single string
+        var classStringResult = classes.Count > 0
+            ? string.Join(' ', classes)
+            : null;
+
+        return (attributes, classStringResult);
     }
 }
