@@ -1,5 +1,3 @@
-using System.Collections.Concurrent;
-
 using Microsoft.AspNetCore.Authorization;
 
 namespace Privileged.Authorization;
@@ -34,7 +32,6 @@ namespace Privileged.Authorization;
 public class PrivilegeRequirementHandler : AuthorizationHandler<PrivilegeRequirement>
 {
     private readonly IPrivilegeContextProvider _contextProvider;
-    private readonly ConcurrentDictionary<string, PrivilegeContext?> _cache;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="PrivilegeRequirementHandler"/> class.
@@ -44,7 +41,6 @@ public class PrivilegeRequirementHandler : AuthorizationHandler<PrivilegeRequire
     public PrivilegeRequirementHandler(IPrivilegeContextProvider contextProvider)
     {
         _contextProvider = contextProvider ?? throw new ArgumentNullException(nameof(contextProvider));
-        _cache = new ConcurrentDictionary<string, PrivilegeContext?>(StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -64,15 +60,12 @@ public class PrivilegeRequirementHandler : AuthorizationHandler<PrivilegeRequire
         if (context.User == null || context.User.Identity?.IsAuthenticated != true)
             return;
 
-        var cacheKey = $"privilege:{context.User.Identity.Name}";
-
-        // Try to get the privilege context from the cache
-        if (!_cache.TryGetValue(cacheKey, out var privilegeContext))
-        {
-            // If not found in cache, obtain the context from the provider
-            privilegeContext = await _contextProvider.GetContextAsync(context.User);
-            _cache[cacheKey] = privilegeContext;
-        }
+        // Resolve the privilege context for the current user. Caching, if desired, is the
+        // responsibility of the IPrivilegeContextProvider implementation so it can control
+        // expiration and invalidation when the user's privileges change.
+        var privilegeContext = await _contextProvider
+            .GetContextAsync(context.User)
+            .ConfigureAwait(false);
 
         // Check if the privilege context contains the required privilege
         if (privilegeContext?.Allowed(requirement.Action, requirement.Subject, requirement.Qualifier) == true)

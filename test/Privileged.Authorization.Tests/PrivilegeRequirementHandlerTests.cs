@@ -367,6 +367,52 @@ public class PrivilegeRequirementHandlerTests
     }
 
     // Test helper classes
+    [Fact]
+    public async Task HandleRequirement_WhenPrivilegesChangeForSameUser_UsesUpdatedContext()
+    {
+        // Arrange
+        var provider = new MutablePrivilegeContextProvider(new PrivilegeBuilder()
+            .Allow("read", "Post")
+            .Build());
+
+        var services = new ServiceCollection();
+        services.AddSingleton<IPrivilegeContextProvider>(provider);
+        services.AddSingleton<IAuthorizationHandler, PrivilegeRequirementHandler>();
+        services.AddAuthorization();
+        services.AddLogging();
+
+        var serviceProvider = services.BuildServiceProvider();
+        var authorizationService = serviceProvider.GetRequiredService<IAuthorizationService>();
+
+        var user = new ClaimsPrincipal(new ClaimsIdentity([new Claim(ClaimTypes.Name, "TestUser")], "TestAuthType"));
+        var requirement = new PrivilegeRequirement("read", "Post");
+
+        await authorizationService.AuthorizeAsync(user, null, requirement);
+
+        // Act: revoke the privilege for the same user
+        provider.Context = new PrivilegeBuilder()
+            .Forbid("read", "Post")
+            .Build();
+
+        var result = await authorizationService.AuthorizeAsync(user, null, requirement);
+
+        // Assert
+        Assert.False(result.Succeeded);
+    }
+
+    private class MutablePrivilegeContextProvider : IPrivilegeContextProvider
+    {
+        public MutablePrivilegeContextProvider(PrivilegeContext context)
+        {
+            Context = context;
+        }
+
+        public PrivilegeContext Context { get; set; }
+
+        public ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
+            => ValueTask.FromResult(Context);
+    }
+
     private class TestPrivilegeContextProvider : IPrivilegeContextProvider
     {
         private readonly PrivilegeContext? _context;

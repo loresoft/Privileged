@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
     /// <remarks>
     /// This method registers:
     /// <list type="bullet">
-    /// <item><description>The <see cref="PrivilegeRequirementHandler"/> as a singleton authorization handler.</description></item>
+    /// <item><description>The <see cref="PrivilegeRequirementHandler"/> as a scoped authorization handler.</description></item>
     /// <item><description>The <see cref="PrivilegePolicyProvider"/> as a singleton policy provider.</description></item>
     /// </list>
     /// <para>
@@ -36,8 +36,9 @@ public static class ServiceCollectionExtensions
         // Add authorization services if not already added
         services.AddAuthorizationCore();
 
-        // Register the privilege requirement handler
-        services.AddSingleton<IAuthorizationHandler, PrivilegeRequirementHandler>();
+        // Register the privilege requirement handler as scoped so it can safely depend on a
+        // scoped IPrivilegeContextProvider without capturing it for the lifetime of the app
+        services.AddScoped<IAuthorizationHandler, PrivilegeRequirementHandler>();
 
         // Register the custom policy provider
         services.AddSingleton<IAuthorizationPolicyProvider, PrivilegePolicyProvider>();
