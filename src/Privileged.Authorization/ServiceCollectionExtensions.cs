@@ -68,7 +68,12 @@ public static class ServiceCollectionExtensions
         services.AddPrivilegeAuthorization();
 
         // Register the privilege context provider
-        services.Add(new ServiceDescriptor(typeof(IPrivilegeContextProvider), typeof(TProvider), lifetime));
+        ServiceDescriptor descriptor = new(
+            serviceType: typeof(IPrivilegeContextProvider),
+            implementationType: typeof(TProvider),
+            lifetime: lifetime);
+
+        services.Add(descriptor);
 
         return services;
     }

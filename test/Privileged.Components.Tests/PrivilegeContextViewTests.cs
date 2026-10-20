@@ -187,6 +187,40 @@ public class PrivilegeContextViewTests : BunitContext
         cut.Find(".loading").Should().NotBeNull();
         cut.Markup.Should().NotContain("Ready!");
     }
+
+    [Fact]
+    public async Task Shares_Context_With_Registered_PrivilegeService()
+    {
+        var provider = new CallCountingProvider();
+        Services.AddSingleton<IPrivilegeContextProvider>(provider);
+        Services.AddPrivilegeComponents();
+
+        var service = Services.GetRequiredService<PrivilegeService>();
+        var serviceContext = await service.GetContextAsync();
+
+        var cut = Render<PrivilegeContextView>(parameters => parameters
+            .Add(p => p.Loaded, (RenderTreeBuilder builder) =>
+            {
+                builder.OpenComponent<TestPrivilegeConsumer>(0);
+                builder.CloseComponent();
+            })
+        );
+
+        var consumer = cut.FindComponent<TestPrivilegeConsumer>();
+        consumer.Instance.ReceivedContext.Should().BeSameAs(serviceContext);
+        provider.CallCount.Should().Be(1);
+    }
+}
+
+internal class CallCountingProvider : IPrivilegeContextProvider
+{
+    public int CallCount { get; private set; }
+
+    public ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
+    {
+        CallCount++;
+        return ValueTask.FromResult(new PrivilegeBuilder().Allow("read", "TestEntity").Build());
+    }
 }
 
 // Test helper classes

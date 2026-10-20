@@ -53,12 +53,23 @@ namespace Privileged.Components;
 /// <seealso cref="AuthenticationStateProvider"/>
 public class PrivilegeContextView : ComponentBase
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="PrivilegeContextView"/> class.
+    /// </summary>
+    /// <param name="privilegeContextProvider">The provider used to load the privilege context.</param>
+    /// <param name="authenticationStateProvider">An optional authentication state provider used to retrieve the current user.</param>
+    /// <param name="privilegeService">
+    /// An optional <see cref="Components.PrivilegeService"/>. When registered, the privilege context is loaded through
+    /// it so the context is shared with other consumers instead of being loaded again.
+    /// </param>
     public PrivilegeContextView(
         IPrivilegeContextProvider privilegeContextProvider,
-        AuthenticationStateProvider? authenticationStateProvider = null)
+        AuthenticationStateProvider? authenticationStateProvider = null,
+        PrivilegeService? privilegeService = null)
     {
         PrivilegeContextProvider = privilegeContextProvider;
         AuthenticationStateProvider = authenticationStateProvider;
+        PrivilegeService = privilegeService;
     }
 
 
@@ -173,6 +184,19 @@ public class PrivilegeContextView : ComponentBase
     protected AuthenticationStateProvider? AuthenticationStateProvider { get; }
 
     /// <summary>
+    /// Gets the optional privilege service used to load and share the privilege context.
+    /// </summary>
+    /// <value>
+    /// The registered <see cref="Components.PrivilegeService"/>, or <c>null</c> when it is not registered.
+    /// </value>
+    /// <remarks>
+    /// When available, the privilege context is loaded through <see cref="PrivilegeService.GetContextAsync"/> so it is
+    /// loaded once and shared with other consumers of the service. Otherwise, the context is loaded directly from
+    /// the <see cref="PrivilegeContextProvider"/>.
+    /// </remarks>
+    protected PrivilegeService? PrivilegeService { get; }
+
+    /// <summary>
     /// Gets or sets the privilege context used for evaluating privilege rules.
     /// </summary>
     /// <value>
@@ -228,7 +252,8 @@ public class PrivilegeContextView : ComponentBase
     /// This method performs the following operations:
     /// </para>
     /// <list type="number">
-    /// <item><description>Retrieves the current authentication state from the <see cref="AuthenticationStateProvider"/></description></item>
+    /// <item><description>When a <see cref="PrivilegeService"/> is registered, loads the shared privilege context from it</description></item>
+    /// <item><description>Otherwise, retrieves the current authentication state from the <see cref="AuthenticationStateProvider"/></description></item>
     /// <item><description>Extracts the <see cref="System.Security.Claims.ClaimsPrincipal"/> from the authentication state</description></item>
     /// <item><description>Calls the <see cref="IPrivilegeContextProvider"/> to load the privilege context for the authenticated user</description></item>
     /// <item><description>Sets the <see cref="PrivilegeContext"/> property with the loaded context</description></item>
@@ -241,8 +266,16 @@ public class PrivilegeContextView : ComponentBase
     /// </remarks>
     protected override async Task OnInitializedAsync()
     {
-        var authenticationState = AuthenticationStateProvider != null ? await AuthenticationStateProvider.GetAuthenticationStateAsync() : null;
-        PrivilegeContext = await PrivilegeContextProvider.GetContextAsync(authenticationState?.User);
+        if (PrivilegeService is not null)
+        {
+            PrivilegeContext = await PrivilegeService.GetContextAsync();
+        }
+        else
+        {
+            var authenticationState = AuthenticationStateProvider != null ? await AuthenticationStateProvider.GetAuthenticationStateAsync() : null;
+            PrivilegeContext = await PrivilegeContextProvider.GetContextAsync(authenticationState?.User);
+        }
+
         StateHasChanged();
     }
 

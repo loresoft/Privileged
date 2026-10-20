@@ -628,6 +628,49 @@ The most common pattern is to wrap your entire layout with `PrivilegeContextView
 
 With this approach, all pages will automatically have access to the privilege context, and users will see a loading state until permissions are loaded. Your navigation menu can also use privilege checking:
 
+### PrivilegeService
+
+`PrivilegeService` evaluates privileges in code without needing a cascading `PrivilegeContext`. The context is loaded from the `IPrivilegeContextProvider` on first use and cached until the authentication state changes, at which point it is reloaded for the new user. When `PrivilegeService` is registered, `PrivilegeContextView` loads its context through the service so the context is only loaded once.
+
+If loading the context fails, `Allowed` and `Forbidden` throw the underlying exception rather than returning a result, and the next call retries the load.
+
+Register the service along with your provider:
+
+```csharp
+// In Program.cs
+builder.Services.AddPrivilegeComponents<YourPrivilegeContextProvider>();
+
+// or register the provider separately
+builder.Services.AddPrivilegeComponents();
+builder.Services.AddScoped<IPrivilegeContextProvider, YourPrivilegeContextProvider>();
+```
+
+Inject and use it in a component:
+
+```razor
+@inject PrivilegeService PrivilegeService
+
+@if (_canEdit)
+{
+    <button>Edit</button>
+}
+
+@code {
+    private bool _canEdit;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _canEdit = await PrivilegeService.Allowed("update", "Post");
+    }
+}
+```
+
+`Allowed` and `Forbidden` return `Task<bool>`, so they can be used directly as a `Func<Task<bool>>` permission callback:
+
+```razor
+<EntitySelect PermissionResolver="@(() => PrivilegeService.Allowed("update", "Post"))" />
+```
+
 ### PrivilegeView Component
 
 Use the `PrivilegeView` component to conditionally render content:

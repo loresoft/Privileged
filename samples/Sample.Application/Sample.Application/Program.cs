@@ -18,8 +18,8 @@ public class Program
             .AddInteractiveServerComponents()
             .AddInteractiveWebAssemblyComponents();
 
-        // register privilege context provider
-        builder.Services.AddScoped<IPrivilegeContextProvider, PrivilegeContextProvider>();
+        // register privilege components and context provider
+        builder.Services.AddPrivilegeComponents<PrivilegeContextProvider>();
 
         var app = builder.Build();
 

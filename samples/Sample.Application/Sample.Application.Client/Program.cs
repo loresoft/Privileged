@@ -13,8 +13,8 @@ internal class Program
     {
         var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-        // register privilege context provider
-        builder.Services.AddScoped<IPrivilegeContextProvider, PrivilegeContextProvider>();
+        // register privilege components and context provider
+        builder.Services.AddPrivilegeComponents<PrivilegeContextProvider>();
 
         await builder.Build().RunAsync();
     }
