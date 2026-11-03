@@ -13,8 +13,8 @@
     <PackageVersion Include="Equatable.Generator" Version="3.0.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Authorization" Version="10.0.14" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.13" />
-    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.13" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Authorization" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.AspNetCore.Components.Web" Version="10.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly" Version="10.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="10.0.14" />
     <PackageVersion Include="MinVer" Version="8.0.0" />
@@ -22,11 +22,11 @@
   </ItemGroup>
   <!-- TFM-specific overrides -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
-    <PackageVersion Update="Microsoft.AspNetCore.Components.Authorization" Version="9.0.21" />
-    <PackageVersion Update="Microsoft.AspNetCore.Components.Web" Version="9.0.21" />
+    <PackageVersion Update="Microsoft.AspNetCore.Components.Authorization" Version="9.0.22" />
+    <PackageVersion Update="Microsoft.AspNetCore.Components.Web" Version="9.0.22" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <PackageVersion Update="Microsoft.AspNetCore.Components.Authorization" Version="8.0.32" />
-    <PackageVersion Update="Microsoft.AspNetCore.Components.Web" Version="8.0.32" />
+    <PackageVersion Update="Microsoft.AspNetCore.Components.Authorization" Version="8.0.33" />
+    <PackageVersion Update="Microsoft.AspNetCore.Components.Web" Version="8.0.33" />
   </ItemGroup>
 </Project>

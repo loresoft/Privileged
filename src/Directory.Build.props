@@ -4,7 +4,6 @@
     <Description>An authorization library for restricting resources by action, subject and qualifiers with rule-based permissions</Description>
     <Copyright>Copyright © $([System.DateTime]::Now.ToString(yyyy)) LoreSoft</Copyright>
     <Authors>LoreSoft</Authors>
-    <NeutralLanguage>en-US</NeutralLanguage>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PackageTags>authorization;auth;privilege;permissions;security;access-control;rule-based;blazor;policy;field-level</PackageTags>
     <PackageProjectUrl>https://github.com/loresoft/Privileged</PackageProjectUrl>
@@ -17,9 +16,10 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Debug">
-    <DebugType>embedded</DebugType>
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <IncludeSymbols>false</IncludeSymbols>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <!-- WASM consumers need PDBs beside the assemblies, not only on a symbol server. -->
+    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
@@ -27,10 +27,13 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Options">
+    <Language>en-US</Language>
+    <NeutralLanguage>en-US</NeutralLanguage>
     <DefaultLanguage>en-US</DefaultLanguage>
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
-    <NoWarn>1591</NoWarn>
+    <Nullable>enable</Nullable>
+    <NoWarn>$(NoWarn);IL2026;IL2091;IL2104;IL2110;IL2111;1591</NoWarn>
   </PropertyGroup>
 
   <PropertyGroup>
