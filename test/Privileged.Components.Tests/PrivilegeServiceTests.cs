@@ -200,7 +200,7 @@ public class PrivilegeServiceTests
         public void SetUser(ClaimsPrincipal user)
         {
             _user = user;
-            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
         }
     }
 

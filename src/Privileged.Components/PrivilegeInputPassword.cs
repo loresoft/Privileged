@@ -346,6 +346,5 @@ public class PrivilegeInputPassword : InputText
     private void ToggleVisibility()
     {
         _passwordVisible = !_passwordVisible;
-        StateHasChanged();
     }
 }

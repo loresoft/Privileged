@@ -210,6 +210,169 @@ public class PrivilegeContextViewTests : BunitContext
         consumer.Instance.ReceivedContext.Should().BeSameAs(serviceContext);
         provider.CallCount.Should().Be(1);
     }
+
+    [Fact]
+    public void Reloads_Context_When_Authentication_State_Changes()
+    {
+        var authStateProvider = new ChangeableAuthenticationStateProvider(CreateUser("bob"));
+        var provider = new PerUserPrivilegeContextProvider();
+        Services.AddSingleton<AuthenticationStateProvider>(authStateProvider);
+        Services.AddSingleton<IPrivilegeContextProvider>(provider);
+
+        var cut = Render<PrivilegeContextView>(parameters => parameters
+            .Add(p => p.Loaded, (RenderTreeBuilder builder) =>
+            {
+                builder.OpenComponent<TestPrivilegeConsumer>(0);
+                builder.CloseComponent();
+            })
+        );
+
+        var consumer = cut.FindComponent<TestPrivilegeConsumer>();
+        consumer.Instance.ReceivedContext!.Allowed("update", "Post").Should().BeFalse();
+
+        authStateProvider.SetUser(CreateUser("alice"));
+
+        cut.WaitForAssertion(() =>
+        {
+            var reloaded = cut.FindComponent<TestPrivilegeConsumer>();
+            reloaded.Instance.ReceivedContext!.Allowed("update", "Post").Should().BeTrue();
+        });
+
+        provider.CallCount.Should().Be(2);
+        provider.LastPrincipal!.Identity!.Name.Should().Be("alice");
+    }
+
+    [Fact]
+    public void Reloads_Shared_Context_When_Authentication_State_Changes_With_PrivilegeService()
+    {
+        var authStateProvider = new ChangeableAuthenticationStateProvider(CreateUser("bob"));
+        var provider = new PerUserPrivilegeContextProvider();
+        Services.AddSingleton<AuthenticationStateProvider>(authStateProvider);
+        Services.AddSingleton<IPrivilegeContextProvider>(provider);
+        Services.AddPrivilegeComponents();
+
+        var cut = Render<PrivilegeContextView>(parameters => parameters
+            .Add(p => p.Loaded, (RenderTreeBuilder builder) =>
+            {
+                builder.OpenComponent<TestPrivilegeConsumer>(0);
+                builder.CloseComponent();
+            })
+        );
+
+        cut.FindComponent<TestPrivilegeConsumer>().Instance.ReceivedContext!.Allowed("update", "Post").Should().BeFalse();
+
+        authStateProvider.SetUser(CreateUser("alice"));
+
+        cut.WaitForAssertion(() =>
+        {
+            var reloaded = cut.FindComponent<TestPrivilegeConsumer>();
+            reloaded.Instance.ReceivedContext!.Allowed("update", "Post").Should().BeTrue();
+        });
+
+        provider.CallCount.Should().Be(2);
+    }
+
+    [Fact]
+    public async Task Ignores_Stale_Initial_Load_When_Authentication_State_Changes()
+    {
+        var authStateProvider = new ChangeableAuthenticationStateProvider(CreateUser("bob"));
+        var gate = new TaskCompletionSource();
+        var provider = new PerUserPrivilegeContextProvider { Gate = gate };
+        Services.AddSingleton<AuthenticationStateProvider>(authStateProvider);
+        Services.AddSingleton<IPrivilegeContextProvider>(provider);
+
+        var cut = Render<PrivilegeContextView>(parameters => parameters
+            .Add(p => p.Loading, builder => builder.AddMarkupContent(0, "<div class='loading'>Loading...</div>"))
+            .Add(p => p.Loaded, (RenderTreeBuilder builder) =>
+            {
+                builder.OpenComponent<TestPrivilegeConsumer>(0);
+                builder.CloseComponent();
+            })
+        );
+
+        cut.Find(".loading").Should().NotBeNull();
+
+        authStateProvider.SetUser(CreateUser("alice"));
+
+        cut.WaitForAssertion(() =>
+        {
+            var reloaded = cut.FindComponent<TestPrivilegeConsumer>();
+            reloaded.Instance.ReceivedContext!.Allowed("update", "Post").Should().BeTrue();
+        });
+
+        // complete the initial load for the previous user; it must not overwrite the current context
+        await cut.InvokeAsync(gate.SetResult);
+
+        cut.FindComponent<TestPrivilegeConsumer>().Instance.ReceivedContext!.Allowed("update", "Post").Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task Unsubscribes_From_Authentication_State_Changes_When_Disposed()
+    {
+        var authStateProvider = new ChangeableAuthenticationStateProvider(CreateUser("bob"));
+        var provider = new PerUserPrivilegeContextProvider();
+        Services.AddSingleton<AuthenticationStateProvider>(authStateProvider);
+        Services.AddSingleton<IPrivilegeContextProvider>(provider);
+
+        Render<PrivilegeContextView>();
+        authStateProvider.SubscriberCount.Should().Be(1);
+
+        await DisposeComponentsAsync();
+
+        authStateProvider.SubscriberCount.Should().Be(0);
+
+        authStateProvider.SetUser(CreateUser("alice"));
+        provider.CallCount.Should().Be(1);
+    }
+
+    private static ClaimsPrincipal CreateUser(string name)
+        => new(new ClaimsIdentity([new Claim(ClaimTypes.Name, name)], "Test"));
+
+    private sealed class ChangeableAuthenticationStateProvider(ClaimsPrincipal user) : AuthenticationStateProvider
+    {
+        private static readonly System.Reflection.FieldInfo EventField = typeof(AuthenticationStateProvider)
+            .GetField(nameof(AuthenticationStateChanged), System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!;
+
+        private ClaimsPrincipal _user = user;
+
+        public int SubscriberCount
+            => (EventField.GetValue(this) as Delegate)?.GetInvocationList().Length ?? 0;
+
+        public override Task<AuthenticationState> GetAuthenticationStateAsync()
+            => Task.FromResult(new AuthenticationState(_user));
+
+        public void SetUser(ClaimsPrincipal user)
+        {
+            _user = user;
+            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+        }
+    }
+
+    private sealed class PerUserPrivilegeContextProvider : IPrivilegeContextProvider
+    {
+        public TaskCompletionSource? Gate { get; set; }
+
+        public int CallCount { get; private set; }
+
+        public ClaimsPrincipal? LastPrincipal { get; private set; }
+
+        public async ValueTask<PrivilegeContext> GetContextAsync(ClaimsPrincipal? claimsPrincipal = null)
+        {
+            CallCount++;
+            LastPrincipal = claimsPrincipal;
+
+            var gate = Gate;
+            Gate = null;
+            if (gate is not null)
+                await gate.Task;
+
+            var builder = new PrivilegeBuilder().Allow("read", "Post");
+            if (claimsPrincipal?.Identity?.Name == "alice")
+                builder.Allow("update", "Post");
+
+            return builder.Build();
+        }
+    }
 }
 
 internal class CallCountingProvider : IPrivilegeContextProvider

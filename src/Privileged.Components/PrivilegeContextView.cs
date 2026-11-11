@@ -27,6 +27,11 @@ namespace Privileged.Components;
 /// The component provides the loaded <see cref="PrivilegeContext"/> as a cascading value to all child components,
 /// enabling privilege-aware components throughout the component tree.
 /// </para>
+/// <para>
+/// When an <see cref="AuthenticationStateProvider"/> is available, the component subscribes to
+/// <see cref="AuthenticationStateProvider.AuthenticationStateChanged"/> and reloads the privilege context for the
+/// new user whenever the authentication state changes, displaying the <see cref="Loading"/> template while reloading.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -51,8 +56,11 @@ namespace Privileged.Components;
 /// <seealso cref="PrivilegeContext"/>
 /// <seealso cref="IPrivilegeContextProvider"/>
 /// <seealso cref="AuthenticationStateProvider"/>
-public class PrivilegeContextView : ComponentBase
+public class PrivilegeContextView : ComponentBase, IDisposable
 {
+    private int _version;
+    private bool _disposed;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="PrivilegeContextView"/> class.
     /// </summary>
@@ -67,7 +75,7 @@ public class PrivilegeContextView : ComponentBase
         AuthenticationStateProvider? authenticationStateProvider = null,
         PrivilegeService? privilegeService = null)
     {
-        PrivilegeContextProvider = privilegeContextProvider;
+        PrivilegeContextProvider = privilegeContextProvider ?? throw new ArgumentNullException(nameof(privilegeContextProvider));
         AuthenticationStateProvider = authenticationStateProvider;
         PrivilegeService = privilegeService;
     }
@@ -252,6 +260,7 @@ public class PrivilegeContextView : ComponentBase
     /// This method performs the following operations:
     /// </para>
     /// <list type="number">
+    /// <item><description>Subscribes to <see cref="AuthenticationStateProvider.AuthenticationStateChanged"/> so the context is reloaded when the user changes</description></item>
     /// <item><description>When a <see cref="PrivilegeService"/> is registered, loads the shared privilege context from it</description></item>
     /// <item><description>Otherwise, retrieves the current authentication state from the <see cref="AuthenticationStateProvider"/></description></item>
     /// <item><description>Extracts the <see cref="System.Security.Claims.ClaimsPrincipal"/> from the authentication state</description></item>
@@ -266,17 +275,82 @@ public class PrivilegeContextView : ComponentBase
     /// </remarks>
     protected override async Task OnInitializedAsync()
     {
-        if (PrivilegeService is not null)
-        {
-            PrivilegeContext = await PrivilegeService.GetContextAsync();
-        }
-        else
-        {
-            var authenticationState = AuthenticationStateProvider != null ? await AuthenticationStateProvider.GetAuthenticationStateAsync() : null;
-            PrivilegeContext = await PrivilegeContextProvider.GetContextAsync(authenticationState?.User);
-        }
+        AuthenticationStateProvider?.AuthenticationStateChanged += OnAuthenticationStateChanged;
 
+        var version = _version;
+        var privilegeContext = await LoadContextAsync(AuthenticationStateProvider?.GetAuthenticationStateAsync());
+
+        // a newer load was started by an authentication state change; let it set the context
+        if (version == _version)
+            PrivilegeContext = privilegeContext;
+    }
+
+
+    /// <summary>
+    /// Releases the resources used by the <see cref="PrivilegeContextView"/>, unsubscribing from
+    /// authentication state changes.
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Releases the resources used by the <see cref="PrivilegeContextView"/>.
+    /// </summary>
+    /// <param name="disposing"><c>true</c> when called from <see cref="Dispose()"/>; otherwise, <c>false</c>.</param>
+    protected virtual void Dispose(bool disposing)
+    {
+        if (!disposing || _disposed)
+            return;
+
+        _disposed = true;
+        _version++;
+
+        AuthenticationStateProvider?.AuthenticationStateChanged -= OnAuthenticationStateChanged;
+    }
+
+
+    private async Task<PrivilegeContext?> LoadContextAsync(Task<AuthenticationState>? authenticationStateTask)
+    {
+        if (PrivilegeService is not null)
+            return await PrivilegeService.GetContextAsync();
+
+        var authenticationState = authenticationStateTask != null ? await authenticationStateTask : null;
+        return await PrivilegeContextProvider.GetContextAsync(authenticationState?.User);
+    }
+
+    private void OnAuthenticationStateChanged(Task<AuthenticationState> authenticationStateTask)
+    {
+        _ = InvokeAsync(() => ReloadContextAsync(authenticationStateTask));
+    }
+
+    private async Task ReloadContextAsync(Task<AuthenticationState> authenticationStateTask)
+    {
+        if (_disposed)
+            return;
+
+        var version = ++_version;
+
+        // discard the previous user's context so stale privileges are never rendered
+        PrivilegeContext = null;
         StateHasChanged();
+
+        try
+        {
+            var privilegeContext = await LoadContextAsync(authenticationStateTask);
+            if (version != _version)
+                return;
+
+            PrivilegeContext = privilegeContext;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            if (version == _version)
+                await DispatchExceptionAsync(ex);
+        }
     }
 
     /// <summary>
