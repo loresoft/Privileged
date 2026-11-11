@@ -4,7 +4,13 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Equatable.Generator" PrivateAssets="all" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <SupportedPlatform Include="browser" />
+  </ItemGroup>
+  
 </Project>
